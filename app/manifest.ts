@@ -9,7 +9,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Airman's Playbook",
     short_name: "Playbook",
-    description: "Pick your job, get the safe starting move, and go run it on GenAI.mil.",
+    description: "Pick your situation, get the safe starting move, and go run it.",
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",

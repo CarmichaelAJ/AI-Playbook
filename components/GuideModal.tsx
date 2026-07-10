@@ -2,15 +2,15 @@
 
 import { useEffect, useRef } from "react";
 import {
-  Bot, BookOpen, FileText, Compass, X, Lightbulb, ExternalLink,
+  Layers, Wrench, GraduationCap, X, Lightbulb, ExternalLink, Link2, ShieldCheck, PenLine,
 } from "lucide-react";
-import { SURFACES, SUGGEST_PLAY_FORM_URL } from "@/lib/links";
+import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
 
-const surfaces = [
-  { icon: FileText, label: "The signed PDF", role: "Doctrine. The authoritative reference.", status: SURFACES.pdf.status },
-  { icon: Bot, label: "The GenAI.mil Agent", role: "Execution. Where you actually run the play.", status: SURFACES.agent.status },
-  { icon: BookOpen, label: "The Notebook", role: "Grounded question and answer against the Playbook.", status: SURFACES.notebook.status },
-  { icon: Compass, label: "This app", role: "Discovery, orientation, routing.", status: "live" as const },
+// The three intent doors — the app routes by intent (Doctrine §4).
+const doors = [
+  { icon: Layers, label: "Execute a task", role: "Get a vetted starter prompt for the situation in front of you." },
+  { icon: Wrench, label: "Find tools & data", role: "See what's approved and the full path to get in." },
+  { icon: GraduationCap, label: "Learn how this works", role: "Short reads on working with AI, and where to go deeper." },
 ];
 
 export default function GuideModal({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -40,7 +40,7 @@ export default function GuideModal({ open, onClose }: { open: boolean; onClose: 
       className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center"
       role="dialog"
       aria-modal="true"
-      aria-label="How to use this app"
+      aria-label="User Guide"
     >
       {/* Backdrop — click-outside to dismiss */}
       <button
@@ -66,8 +66,8 @@ export default function GuideModal({ open, onClose }: { open: boolean; onClose: 
                 <div className="w-px h-5 bg-silver/40 flex-shrink-0" aria-hidden="true" />
                 <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s Playbook</span>
               </div>
-              <h2 className="font-display text-2xl font-bold uppercase tracking-wider">How to Use This App</h2>
-              <p className="text-sm text-on-dark mt-0.5">What it does, what it does not, and where it points you.</p>
+              <h2 className="font-display text-2xl font-bold uppercase tracking-wider">User Guide</h2>
+              <p className="text-sm text-on-dark mt-0.5">What the Playbook is, what it isn&apos;t, and where it points you.</p>
             </div>
             <button
               ref={closeRef}
@@ -81,18 +81,25 @@ export default function GuideModal({ open, onClose }: { open: boolean; onClose: 
         </div>
 
         <div className="px-4 pt-5 flex flex-col gap-5 pb-7">
-          {/* What this app is, in one line — the home page carries the full flow */}
-          <p className="text-sm text-gray-600 leading-relaxed">
-            This app is the <span className="font-semibold text-primary-dark">discovery layer</span> of the Playbook —
-            it finds the right play or tool for your task and points you to where to run it. It never runs a model,
-            holds your data, or replaces the system of record. It is one of four surfaces that work together.
-          </p>
+          {/* What this app is — the conduit identity */}
+          <div className="flex gap-3 p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting">
+            <div className="w-9 h-9 rounded-inner bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Link2 size={17} className="text-primary" />
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              The Playbook is a <span className="font-semibold text-primary-dark">conduit</span> — a single layer over what
+              already exists. It connects you to the right play, the right approved tool with the path to get in, and a clear
+              way to think about AI. It <span className="font-semibold text-primary-dark">never runs a model, holds your
+              data, or replaces a system of record</span> — it points you to GenAI.mil, Ask Sage, Envision, and the official
+              resources, and gets out of your way.
+            </p>
+          </div>
 
-          {/* Four surfaces */}
+          {/* How to use it — the three doors */}
           <div>
-            <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">One product, four surfaces</p>
+            <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">How to use it</p>
             <div className="flex flex-col gap-2">
-              {surfaces.map(({ icon: Icon, label, role, status }) => (
+              {doors.map(({ icon: Icon, label, role }) => (
                 <div key={label} className="flex items-center gap-3 p-3 rounded-card bg-white border border-silver-mid/40 shadow-resting">
                   <div className="w-9 h-9 rounded-inner bg-silver-tint flex items-center justify-center flex-shrink-0">
                     <Icon size={17} className="text-primary" />
@@ -101,19 +108,24 @@ export default function GuideModal({ open, onClose }: { open: boolean; onClose: 
                     <p className="text-sm font-bold text-primary-dark leading-tight">{label}</p>
                     <p className="text-xs text-gray-500 leading-snug">{role}</p>
                   </div>
-                  <span
-                    className={`text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-badge flex-shrink-0 ${
-                      status === "live" ? "bg-success-tint text-success-mid" : "bg-gray-100 text-gray-500"
-                    }`}
-                  >
-                    {status === "live" ? "Live" : "Coming soon"}
-                  </span>
                 </div>
               ))}
             </div>
           </div>
 
+          {/* Accountability — plain language */}
+          <div className="flex gap-3 p-4 rounded-card bg-primary/5 border border-primary/20">
+            <div className="w-9 h-9 rounded-inner bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <PenLine size={17} className="text-primary" />
+            </div>
+            <p className="text-xs text-primary-dark leading-relaxed">
+              <span className="font-bold">AI drafts; you sign.</span> The app hands you a starting move — you own the result.
+              Check the work before your name goes on it.
+            </p>
+          </div>
+
           {/* Suggest a play — SME contribution door */}
+          {/* FLAGGED: suggest-a-play mechanism endorsed in spirit; placement + wording unratified (Doctrine appendix). */}
           <div>
             <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">Help build the Playbook</p>
             {SUGGEST_PLAY_FORM_URL ? (
@@ -149,10 +161,13 @@ export default function GuideModal({ open, onClose }: { open: boolean; onClose: 
           </div>
 
           {/* OPSEC line */}
-          <div className="p-4 rounded-card bg-warm/10 border border-warm/30">
+          <div className="flex gap-3 p-4 rounded-card bg-warm/10 border border-warm/30">
+            <div className="w-9 h-9 rounded-inner bg-warm/20 flex items-center justify-center flex-shrink-0">
+              <ShieldCheck size={17} className="text-caution" />
+            </div>
             <p className="text-xs text-primary-dark leading-relaxed">
-              <span className="font-bold">Stay clean at IL2.</span> Never enter classified, CUI, or PII into any AI
-              tool. Use generic, unclassified examples, and verify every output before official use.
+              <span className="font-bold">Stay clean.</span> Never enter classified, CUI, or PII into any AI tool. Use
+              generic, unclassified examples, and check every output before your name goes on it.
             </p>
           </div>
         </div>

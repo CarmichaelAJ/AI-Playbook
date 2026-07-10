@@ -1,10 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { Layers, Wrench, Clock, Zap, X, Star } from "lucide-react";
+import { Layers, Wrench, Clock, Zap, X, Star, ExternalLink, Rocket } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import { useFavorites, usePlaysRun } from "@/lib/favorites";
 import { useTimeBack, formatTimeBack } from "@/lib/timeBack";
+
+// Quick-launch — the second purpose of the dashboard: a fast front door to the
+// approved AI tools (Doctrine §4). Envision has no public URL yet (workstation login).
+const QUICK_LAUNCH = [
+  { name: "GenAI.mil", url: "https://genai.mil", icon: "🛡️", note: "Start here" },
+  { name: "Ask Sage", url: "https://chat.asksage.ai", icon: "🧭", note: "Advanced" },
+  { name: "Envision", url: "", icon: "🔭", note: "Workstation" },
+];
 
 // Play-type mix is mock data this pass — real breakdown lands with Inc 2 analytics.
 const PLAY_TYPES = [
@@ -34,6 +42,47 @@ function PlayTypeBars() {
   );
 }
 
+function QuickLaunch() {
+  return (
+    <ScrollReveal>
+      <div>
+        <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <Rocket size={12} className="text-primary" /> Launch a tool
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          {QUICK_LAUNCH.map(({ name, url, icon, note }) => {
+            const inner = (
+              <>
+                <span className="text-2xl leading-none">{icon}</span>
+                <span className="text-xs font-bold text-primary-dark leading-tight text-center">{name}</span>
+                <span className="text-[9px] font-semibold uppercase tracking-wide text-silver">{note}</span>
+              </>
+            );
+            const cls =
+              "flex flex-col items-center justify-center gap-1 p-3 rounded-card bg-white border border-silver-mid/40 shadow-resting text-center";
+            return url ? (
+              <a
+                key={name}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${cls} active:bg-primary/5 transition-colors relative`}
+              >
+                <ExternalLink size={11} className="absolute top-2 right-2 text-silver" />
+                {inner}
+              </a>
+            ) : (
+              <div key={name} className={`${cls} opacity-80`}>
+                {inner}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </ScrollReveal>
+  );
+}
+
 export default function DashboardPage() {
   const { items, remove } = useFavorites();
   const playsRun = usePlaysRun();
@@ -50,10 +99,23 @@ export default function DashboardPage() {
           <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s Playbook</span>
         </div>
         <h1 className="font-display text-2xl font-bold uppercase tracking-wider mb-1">Dashboard</h1>
-        <p className="text-sm text-on-dark">Your plays, your tools, your time back — saved on this device.</p>
+        <p className="text-sm text-on-dark">
+          Save plays and tools for later, and launch the approved AI tools fast — your front door on any device.
+        </p>
       </div>
 
       <div className="px-4 pt-5 flex flex-col gap-5 pb-6">
+        {/* Quick-launch the approved AI tools */}
+        <QuickLaunch />
+
+        {/* Local-only tradeoff, stated honestly */}
+        <ScrollReveal>
+          <p className="text-[11px] text-gray-500 leading-snug px-1">
+            Everything here is saved on <span className="font-semibold text-primary-dark">this device only</span> — no account,
+            and nothing leaves the device. That&apos;s the safety promise, and the limit: your saves won&apos;t follow you to another phone or computer yet.
+          </p>
+        </ScrollReveal>
+
         {/* Metrics tiles */}
         <ScrollReveal>
           <div className="grid grid-cols-2 gap-3">
@@ -102,11 +164,11 @@ export default function DashboardPage() {
                   <Star size={18} className="text-silver" />
                 </div>
                 <p className="text-xs text-gray-500 leading-snug">
-                  Star plays and tools to add them here.
+                  Star plays and tools to add them here — discover on your phone, run them at your workstation.
                 </p>
               </div>
             ) : (
-              <div className="flex flex-col gap-2">
+              <div className="grid gap-2 md:grid-cols-2">
                 {items.map((item) => {
                   const Icon = item.type === "play" ? Layers : Wrench;
                   const isExternal = item.url.startsWith("http");

@@ -2,7 +2,7 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 
-// ─── Time-back capture (IL2-safe measurement layer) ───────────────────────────
+// ─── Time-back capture (device-local measurement layer) ───────────────────────
 // Self-reported, local only. We store a single running total of minutes in
 // localStorage. No play content, no task detail, nothing identifying is stored —
 // just an honest, user-owned estimate of time reclaimed.

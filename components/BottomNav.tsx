@@ -25,7 +25,7 @@ export default function BottomNav() {
 
   return (
     <nav className={`fixed bottom-0 left-0 right-0 z-50 nav-glass bottom-nav-safe ${scrolled ? "scrolled" : ""}`}>
-      <div className="flex max-w-lg mx-auto">
+      <div className="flex max-w-lg md:max-w-3xl lg:max-w-6xl mx-auto">
         {tabs.map(({ href, label, icon: Icon }) => {
           const active = pathname === href;
           return (

@@ -2,7 +2,7 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 
-// ─── Favorites + run-tracking (IL2-safe personalization layer) ────────────────
+// ─── Favorites + run-tracking (device-local personalization layer) ────────────
 // Mirrors lib/timeBack.ts exactly: localStorage is the external store, reads go
 // through useSyncExternalStore, and changes broadcast via a custom in-tab event
 // plus the native cross-tab storage event. Nothing identifying is stored — just

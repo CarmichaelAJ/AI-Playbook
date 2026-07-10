@@ -1,16 +1,15 @@
 "use client";
 
 import { useState, useRef, useLayoutEffect, useCallback } from "react";
-import { ExternalLink, Shield, Clock, Check, Monitor, Star } from "lucide-react";
+import {
+  ExternalLink, Shield, Clock, Monitor, ChevronDown, ChevronUp, ArrowUpRight, ListChecks, CalendarClock,
+} from "lucide-react";
 import { TOOLS, USE_CASES, SECTIONS, type UseCase, type Section, type Tool } from "@/lib/mock/tools";
 import StarToggle from "@/components/StarToggle";
-import ContextModeToggle from "@/components/ContextModeToggle";
-import { useMode } from "@/lib/mode";
-import { useIsStarred, toggleStar, type StarredItem } from "@/lib/favorites";
 
 // Every tool on this page is approved for official use. One badge, one meaning.
 const APPROVED_BADGE = {
-  label: "Approved for official use, verify locally",
+  label: "Approved for official use — confirm locally",
   color: "bg-success-tint text-success-mid",
 };
 
@@ -19,7 +18,7 @@ const sectionFilterLabel: Record<Section | "All", string> = {
   ai:         "AI",
   automation: "Automation",
   data:       "Data",
-  digital:    "Digital",
+  platforms:  "Platforms",
   soon:       "Coming Soon",
 };
 
@@ -77,45 +76,21 @@ function SegmentedFilter<T extends string>({
   );
 }
 
-// Save-to-dashboard action for desktop/NIPR-only tools the Airman can't open here.
-// Reuses the favorites store, so it stays in sync with the card's star (ADR-R07 —
-// replaces the retired "Send to me" relay with an in-app save; honesty over dead links).
-function SaveToDashboard({ item }: { item: StarredItem }) {
-  const saved = useIsStarred(item.id);
-  return (
-    <button
-      onClick={() => toggleStar(item)}
-      aria-pressed={saved}
-      className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-inner text-sm font-semibold transition-colors ${
-        saved ? "bg-success text-white" : "bg-white border border-primary/40 text-primary active:bg-primary/5"
-      }`}
-    >
-      {saved ? (
-        <><Check size={15} /> Saved to your dashboard</>
-      ) : (
-        <><Star size={15} /> Save to your dashboard</>
-      )}
-    </button>
-  );
-}
-
-function ToolCard({ tool, index }: { tool: Tool; index: number }) {
-  const mode = useMode();
+function ToolCard({ tool }: { tool: Tool }) {
+  const [expanded, setExpanded] = useState(false);
 
   const live = !tool.inDevelopment && !!tool.url;
   const workstationOnly = !tool.accessibleMobile;
-  // Openable here when the tool works on any device, or when the Airman says they are
-  // at a workstation (ADR-R08). Otherwise offer "Save to your dashboard" so they can
-  // run it later at a workstation.
-  const canOpen = live && (tool.accessibleMobile || mode === "workstation");
 
   return (
-    <div
-      className="animate-fade-up bg-white rounded-card shadow-resting border border-silver-mid/50 hover:shadow-hover hover:border-primary/25 p-5 transition-all duration-base ease-smooth"
-      style={{ animationDelay: `${Math.min(index * 50, 300)}ms` }}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3 flex-1 min-w-0">
+    <div className="bg-white rounded-card shadow-resting border border-silver-mid/50 hover:shadow-hover hover:border-primary/25 overflow-hidden transition-all duration-base ease-smooth">
+      {/* Collapsed header — name, tagline, badge; content toggles expand */}
+      <div className="flex items-start gap-2 p-5">
+        <button
+          onClick={() => setExpanded((e) => !e)}
+          className="flex items-start gap-3 flex-1 min-w-0 text-left"
+          aria-expanded={expanded}
+        >
           <span className="text-2xl leading-none mt-0.5">{tool.icon}</span>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-0.5">
@@ -128,52 +103,104 @@ function ToolCard({ tool, index }: { tool: Tool; index: number }) {
             </div>
             <p className="text-[11px] text-primary font-semibold">{tool.tagline}</p>
           </div>
-        </div>
-        <StarToggle
-          item={{ type: "tool", id: tool.id, title: tool.name, url: tool.url }}
-          className="-mr-1.5 -mt-1"
-        />
-      </div>
+        </button>
 
-      <p className="text-xs text-gray-600 mt-2 leading-relaxed">{tool.description}</p>
-
-      {workstationOnly && !canOpen && (
-        <p className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-400 mt-2">
-          <Monitor size={11} /> Open this one from your government workstation.
-        </p>
-      )}
-
-      <div className="flex items-center gap-2 mt-3 flex-wrap">
-        <span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-badge ${APPROVED_BADGE.color}`}>
-          <Shield size={10} />
-          {APPROVED_BADGE.label}
-        </span>
-        {tool.useCases.map((uc) => (
-          <span key={uc} className="text-[10px] font-medium px-2 py-1 rounded-badge bg-gray-100 text-gray-500">
-            {uc}
-          </span>
-        ))}
-      </div>
-
-      {/* Device-aware action — ADR-R08 mode drives open vs. save */}
-      <div className="mt-4">
-        {!live ? (
-          <span className="w-full flex items-center justify-center gap-2 py-2.5 rounded-inner text-sm font-semibold bg-gray-100 text-gray-400 cursor-not-allowed">
-            <Clock size={15} /> Coming soon
-          </span>
-        ) : canOpen ? (
-          <a
-            href={tool.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-inner text-sm font-semibold bg-primary text-white active:bg-primary-dark transition-colors"
+        <div className="flex items-center gap-0.5 flex-shrink-0 -mr-1.5">
+          <StarToggle item={{ type: "tool", id: tool.id, title: tool.name, url: tool.url }} />
+          <button
+            onClick={() => setExpanded((e) => !e)}
+            aria-label={expanded ? "Collapse tool" : "Expand tool"}
+            aria-expanded={expanded}
+            className="p-1.5 text-gray-400 hover:text-primary transition-colors"
           >
-            <ExternalLink size={15} /> Open tool
-          </a>
-        ) : (
-          <SaveToDashboard item={{ type: "tool", id: tool.id, title: tool.name, url: tool.url }} />
-        )}
+            {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+        </div>
       </div>
+
+      {expanded && (
+        <div className="px-5 pb-5 border-t border-silver-mid/40">
+          {/* What it is */}
+          <p className="text-xs text-gray-600 mt-3 leading-relaxed">{tool.whatItIs}</p>
+
+          {/* Authorization — linked to source, never asserted */}
+          <div className="mt-3 flex items-start gap-2">
+            <Shield size={14} className="flex-shrink-0 mt-0.5 text-success-mid" />
+            <p className="text-xs text-primary-dark leading-snug">
+              {tool.authorization.label}{" "}
+              {tool.authorization.sourceUrl ? (
+                <a
+                  href={tool.authorization.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-0.5 text-primary font-semibold underline underline-offset-2"
+                >
+                  Source <ArrowUpRight size={11} />
+                </a>
+              ) : (
+                <span className="text-gray-400">Confirm with your local guidance.</span>
+              )}
+            </p>
+          </div>
+
+          {/* Use cases */}
+          <div className="flex items-center gap-2 mt-3 flex-wrap">
+            <span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-badge ${APPROVED_BADGE.color}`}>
+              <Shield size={10} />
+              {APPROVED_BADGE.label}
+            </span>
+            {tool.useCases.map((uc) => (
+              <span key={uc} className="text-[10px] font-medium px-2 py-1 rounded-badge bg-gray-100 text-gray-500">
+                {uc}
+              </span>
+            ))}
+          </div>
+
+          {/* The full access path */}
+          <div className="mt-4">
+            <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-silver mb-1.5">
+              <ListChecks size={12} /> How to get in
+            </p>
+            <ol className="flex flex-col gap-1.5">
+              {tool.accessPath.map((step, i) => (
+                <li key={i} className="flex gap-2 text-xs text-gray-600 leading-snug">
+                  <span className="flex-shrink-0 w-4 h-4 rounded-full bg-primary/10 text-primary text-[9px] font-bold flex items-center justify-center mt-0.5">
+                    {i + 1}
+                  </span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
+            <p className="flex items-center gap-1.5 text-[10px] text-gray-400 mt-2">
+              <CalendarClock size={11} /> Access path — draft, pending verification · updated {tool.accessVerified}
+            </p>
+          </div>
+
+          {workstationOnly && (
+            <p className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-400 mt-3">
+              <Monitor size={11} /> Open this one from your government workstation.
+            </p>
+          )}
+
+          {/* Open the tool */}
+          <div className="mt-3">
+            {live ? (
+              <a
+                href={tool.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-inner text-sm font-semibold bg-primary text-white active:bg-primary-dark transition-colors"
+              >
+                <ExternalLink size={15} /> Open tool
+              </a>
+            ) : (
+              <span className="w-full flex items-center justify-center gap-2 py-2.5 rounded-inner text-sm font-semibold bg-gray-100 text-gray-400 cursor-not-allowed">
+                <Clock size={15} /> Coming soon
+              </span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -217,9 +244,6 @@ export default function ToolsPage() {
     .map((s) => ({ ...s, tools: filtered.filter((t) => t.section === s.id) }))
     .filter((s) => s.tools.length > 0);
 
-  // Running index across sections keeps the fade-up cascade smooth.
-  let cardIndex = 0;
-
   return (
     <div className="flex flex-col">
       {/* Header */}
@@ -231,16 +255,11 @@ export default function ToolsPage() {
           <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s Playbook</span>
         </div>
         <h1 className="font-display text-2xl font-bold uppercase tracking-wider mb-1">
-          AI Tools
+          Tools
         </h1>
         <p className="text-sm text-on-dark">
-          Every tool on this page is approved for official use. Start at GenAI.mil for official, unclassified work.
+          Every tool here is approved for official use. Open one to see what it is, who it&apos;s cleared for, and the full path to get in.
         </p>
-      </div>
-
-      {/* Context mode — decides whether cards lead with "Open tool" or "Save" */}
-      <div className="px-4 pt-4">
-        <ContextModeToggle />
       </div>
 
       {/* Category filter */}
@@ -278,16 +297,18 @@ export default function ToolsPage() {
       </div>
 
       {/* Tool cards, grouped by section */}
-      <div className={`px-4 flex flex-col gap-3 pb-4 filter-grid ${fading ? "fading" : ""}`}>
+      <div className={`px-4 flex flex-col gap-5 pb-4 filter-grid ${fading ? "fading" : ""}`}>
         {groupedSections.map((section) => (
-          <div key={section.id} className="flex flex-col gap-3">
-            <div className="mt-2 first:mt-0">
+          <div key={section.id}>
+            <div className="mb-2">
               <h2 className="text-xs font-bold text-primary-dark uppercase tracking-wider">{section.label}</h2>
               <p className="text-[11px] text-gray-500 mt-0.5">{section.blurb}</p>
             </div>
-            {section.tools.map((tool) => (
-              <ToolCard key={tool.id} tool={tool} index={cardIndex++} />
-            ))}
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {section.tools.map((tool) => (
+                <ToolCard key={tool.id} tool={tool} />
+              ))}
+            </div>
           </div>
         ))}
 

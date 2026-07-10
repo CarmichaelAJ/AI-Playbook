@@ -3,54 +3,56 @@
 import Link from "next/link";
 import {
   Clock, ArrowRight, Layers, Wrench, GraduationCap,
-  Compass, Bot, CheckCircle2, ShieldCheck, Lightbulb, ExternalLink,
+  Zap, Repeat, TrendingUp, ShieldCheck, Lightbulb, ExternalLink, BookOpen,
 } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
-import ContextModeToggle from "@/components/ContextModeToggle";
 import { useTimeBack, formatTimeBack } from "@/lib/timeBack";
 import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
 
-// ─── Where do you want to start? — the multi-path router into the app ───────────
+// ─── Where do you want to start? — the intent doors (route by intent, not device) ─
 const paths = [
   {
     href: "/plays",
     icon: Layers,
-    title: "I have a task to speed up",
-    body: "Plays for your AFSC and the everyday admin everyone does. Copy a vetted starter prompt and go.",
+    title: "Execute a task",
+    body: "Get the safe starting move for the situation in front of you — evaluations, awards, emails, tough conversations, and more. Copy a vetted starter prompt and go.",
     primary: true,
   },
   {
     href: "/tools",
     icon: Wrench,
-    title: "I need the right tool",
-    body: "Browse the approved AI, automation, and data tools, from GenAI.mil to Power Automate. If it's listed, it's approved for official use.",
+    title: "Find tools & data",
+    body: "Browse the approved AI, automation, and data tools — from GenAI.mil to SharePoint — with the full access path to get in. If it's listed, it's approved.",
     primary: false,
   },
   {
     href: "/ai-101",
     icon: GraduationCap,
-    title: "I'm new to all this",
-    body: "Six quick reads on what AI is, what it's not, and how to stay safe. You can't break anything here.",
+    title: "Learn how this works",
+    body: "Short reads on what AI is, how to work with it, and how to go deeper. You can't break anything here.",
     primary: false,
   },
 ];
 
-// ─── How it works — the universal loop, not just the play flow ──────────────────
-const steps = [
+// ─── The Three Levels of Engagement — the depth ladder, before you open a play ───
+const levels = [
   {
-    icon: Compass,
-    title: "Find your move",
-    body: "Pick a play for your job or a tool for the task.",
+    n: 1,
+    icon: Zap,
+    title: "Execute",
+    body: "Team with AI to finish today's task faster. One play, one prompt, minutes back.",
   },
   {
-    icon: Bot,
-    title: "Run it on the right surface",
-    body: "Copy the starter prompt and run it where it belongs. GenAI.mil is the place to start for official, unclassified work.",
+    n: 2,
+    icon: Repeat,
+    title: "Systematize",
+    body: "The task repeats? Build a reusable agent with saved context and templates, so the result is consistent every time.",
   },
   {
-    icon: CheckCircle2,
-    title: "Verify before it's official",
-    body: "The app never generates or stores anything for you. You own and check every output.",
+    n: 3,
+    icon: TrendingUp,
+    title: "Improve & Optimize",
+    body: "Question the process itself. Map the flow, find the waste, and build the case to make it better.",
   },
 ];
 
@@ -86,7 +88,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export default function HomePage() {
   return (
     <div className="flex flex-col">
-      {/* ── Hero / value-prop landing ── */}
+      {/* ── Hero: what this is (mission statement) + the User Guide door ── */}
       <div className="relative hero-af text-white px-5 pt-8 pb-10 overflow-hidden rounded-b-[24px]">
         <div aria-hidden="true" className="pointer-events-none select-none">
           <div className="hero-blob-1 absolute -top-20 -right-20 w-72 h-72 rounded-full" />
@@ -106,21 +108,22 @@ export default function HomePage() {
             Airman&apos;s<br />Playbook
           </h1>
 
+          {/* FLAGGED: "Built for Airmen, by Airmen" tagline pending product-owner adjudication (Doctrine appendix) */}
           <p className="text-caption font-bold uppercase tracking-widest text-warm mb-4">
             Built for Airmen, by Airmen
           </p>
 
-          <p className="text-base text-white font-semibold leading-snug max-w-[20rem]">
-            Your starting point for AI at work. Find the play for your job, the right tool for the task,
+          <p className="text-base text-white font-semibold leading-snug max-w-[22rem]">
+            Your front door to AI at work. Find the move for your situation, the right approved tool,
             and the safe way to run it.
           </p>
 
-          {/* Pathway to the deeper Guide modal (the "?" trigger lives here now) */}
+          {/* How do I use it — one clearly visible User Guide door (first-visit value, no repeat tax) */}
           <button
             onClick={openGuide}
-            className="mt-6 text-xs font-semibold text-on-dark underline underline-offset-4 decoration-on-dark/40 hover:text-white transition-colors"
+            className="mt-6 inline-flex items-center gap-2 rounded-badge border border-white/40 bg-white/10 px-4 py-2 text-sm font-bold text-white hover:bg-white/20 transition-colors"
           >
-            What is this?
+            <BookOpen size={15} /> User Guide
           </button>
         </div>
       </div>
@@ -130,22 +133,17 @@ export default function HomePage() {
         {/* Returning-user tally (only renders once something is logged) */}
         <TimeReclaimed />
 
-        {/* Context question — sets workstation vs. mobile mode (ADR-R08) */}
-        <ScrollReveal>
-          <ContextModeToggle />
-        </ScrollReveal>
-
-        {/* Where do you want to start? — the multi-path router */}
+        {/* Where do you want to start? — the intent doors */}
         <section>
           <ScrollReveal>
             <SectionLabel>Where do you want to start?</SectionLabel>
           </ScrollReveal>
-          <div className="flex flex-col gap-3">
+          <div className="grid gap-3 md:grid-cols-3">
             {paths.map(({ href, icon: Icon, title, body, primary }) => (
               <ScrollReveal key={href}>
                 <Link
                   href={href}
-                  className={`flex items-center gap-3 p-4 rounded-card shadow-resting active:scale-[0.99] transition-transform ${
+                  className={`flex md:flex-col items-center md:items-start gap-3 h-full p-4 rounded-card shadow-resting active:scale-[0.99] transition-transform ${
                     primary
                       ? "bg-primary text-white"
                       : "bg-white border border-silver-mid/40"
@@ -166,41 +164,51 @@ export default function HomePage() {
                       {body}
                     </p>
                   </div>
-                  <ArrowRight size={16} className={`flex-shrink-0 ${primary ? "text-white/70" : "text-silver"}`} />
+                  <ArrowRight size={16} className={`flex-shrink-0 md:hidden ${primary ? "text-white/70" : "text-silver"}`} />
                 </Link>
               </ScrollReveal>
             ))}
           </div>
         </section>
 
-        {/* How it works — the universal loop */}
+        {/* Three Levels of Engagement — the depth ladder exists before you open a play */}
         <section>
           <ScrollReveal>
-            <SectionLabel>How it works</SectionLabel>
+            <SectionLabel>How deep do you want to go?</SectionLabel>
           </ScrollReveal>
-          <div className="flex flex-col gap-3">
-            {steps.map(({ icon: Icon, title, body }, i) => (
-              <ScrollReveal key={title}>
-                <div className="flex gap-3 p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting">
+          <div className="grid gap-3 md:grid-cols-3">
+            {levels.map(({ n, icon: Icon, title, body }) => (
+              <ScrollReveal key={n}>
+                <div className="flex md:flex-col gap-3 h-full p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting">
                   <div className="flex-shrink-0">
                     <div className="w-9 h-9 rounded-inner bg-primary/10 flex items-center justify-center relative">
                       <Icon size={18} className="text-primary" />
                       <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-primary text-white text-[9px] font-bold flex items-center justify-center">
-                        {i + 1}
+                        {n}
                       </span>
                     </div>
                   </div>
                   <div className="min-w-0">
-                    <h2 className="text-sm font-bold text-primary-dark">{title}</h2>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-silver leading-none">Level {n}</p>
+                    <h2 className="text-sm font-bold text-primary-dark mt-0.5">{title}</h2>
                     <p className="text-xs text-gray-500 mt-0.5 leading-snug">{body}</p>
                   </div>
                 </div>
               </ScrollReveal>
             ))}
           </div>
+          <ScrollReveal>
+            <p className="text-[11px] text-gray-500 mt-2 leading-snug">
+              You choose how deep to go — every play runs today at Level 1. See the depth ladder in{" "}
+              <Link href="/ai-101" className="text-primary font-semibold underline underline-offset-2">AI 101</Link>.
+            </p>
+          </ScrollReveal>
         </section>
 
-        {/* Built to be safe at IL2 — security reframed as a trust signal */}
+        {/* Built to be safe by design — security reframed as a trust signal */}
+        {/* FLAGGED: safety-by-design block wording pending product-owner adjudication (Doctrine appendix).
+            Underlying posture (no CUI/PII/classified, local-only, check your output) is consistent with intent;
+            the phrasing — including "verify every output before official use" — is unratified. Left verbatim. */}
         <section>
           <ScrollReveal>
             <SectionLabel>Built to be safe by design</SectionLabel>
@@ -219,6 +227,7 @@ export default function HomePage() {
         </section>
 
         {/* Suggest a play — SME contribution door */}
+        {/* FLAGGED: suggest-a-play mechanism endorsed in spirit; placement + wording unratified (Doctrine appendix). */}
         <section>
           <ScrollReveal>
             <SectionLabel>Help build the Playbook</SectionLabel>
