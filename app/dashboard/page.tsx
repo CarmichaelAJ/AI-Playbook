@@ -7,7 +7,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Layers, Wrench, X, Star, ExternalLink, Rocket, ShieldCheck } from "lucide-react";
+import { Layers, Wrench, X, Star, ExternalLink, ShieldCheck } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import { useFavorites } from "@/lib/favorites";
 import { STRATEGY_STACK, ALL_LIBRARY, SHELF_FILTERS, LATEST_IDS } from "@/content/library";

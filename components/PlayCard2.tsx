@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   ChevronDown, ChevronUp, Copy, Check, Zap, Clock, ShieldAlert,
   ArrowUpRight, Info, Plug, TrendingUp,
