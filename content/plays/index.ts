@@ -372,7 +372,7 @@ export const PLAYS: ContentItem[] = [
         "Each section drafted to the scoring areas with 2 candidate versions, every unquantified claim flagged, and a final one-story check.",
       verify: [
         "Confirm the current award cycle's format and criteria with your awards monitor",
-        "Every claim has a number or a witness — fix or cut the rest",
+        "Every claim has a number or a witness — fix or drop the rest",
         "Check every figure against the record before submission",
       ],
     },

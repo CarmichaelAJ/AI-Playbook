@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run lint:lexicon && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "lint:lexicon": "node scripts/lint-lexicon.mjs",
+    "test:verbatim": "node scripts/test-verbatim.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.18.0",
