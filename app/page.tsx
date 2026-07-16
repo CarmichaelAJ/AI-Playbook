@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import {
-  Clock, ArrowRight, Layers, Wrench, GraduationCap,
+  ArrowRight, Layers, Wrench, GraduationCap,
   Zap, Repeat, TrendingUp, ShieldCheck, Lightbulb, ExternalLink, BookOpen,
 } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
-import { useTimeBack, formatTimeBack } from "@/lib/timeBack";
 import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
 
 // ─── Where do you want to start? — the intent doors (route by intent, not device) ─
@@ -55,26 +54,6 @@ const levels = [
     body: "Question the process itself. Map the flow, find the waste, and build the case to make it better.",
   },
 ];
-
-// ─── Local, self-reported time-back tally (returning user only) ─────────────────
-function TimeReclaimed() {
-  const { minutes } = useTimeBack();
-  if (minutes <= 0) return null;
-  return (
-    <ScrollReveal>
-      <div className="flex items-center gap-3 p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting">
-        <div className="p-2.5 rounded-inner bg-primary/10 flex-shrink-0">
-          <Clock size={18} className="text-primary" />
-        </div>
-        <div className="min-w-0 text-left">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-silver">Time reclaimed so far</p>
-          <p className="text-base font-bold text-primary-dark leading-tight">{formatTimeBack(minutes)}</p>
-          <p className="text-[10px] text-gray-400 leading-tight">Self-reported estimate, on this device only.</p>
-        </div>
-      </div>
-    </ScrollReveal>
-  );
-}
 
 function openGuide() {
   window.dispatchEvent(new Event("ap:open-guide"));
@@ -130,9 +109,6 @@ export default function HomePage() {
 
       {/* ── Front-door content — one rhythm for every section ── */}
       <div className="px-4 pt-5 pb-8 flex flex-col gap-7">
-        {/* Returning-user tally (only renders once something is logged) */}
-        <TimeReclaimed />
-
         {/* Where do you want to start? — the intent doors */}
         <section>
           <ScrollReveal>

@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Home, GraduationCap, Layers, Wrench, LayoutDashboard } from "lucide-react";
+import { Home, GraduationCap, Layers, Wrench, Building2 } from "lucide-react";
 
 const tabs = [
   { href: "/", label: "Home", icon: Home },
   { href: "/plays", label: "Plays", icon: Layers },
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard", label: "HQ", icon: Building2 },
   { href: "/tools", label: "Tools", icon: Wrench },
   { href: "/ai-101", label: "AI 101", icon: GraduationCap },
 ];
