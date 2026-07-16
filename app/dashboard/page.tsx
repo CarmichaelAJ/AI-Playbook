@@ -7,7 +7,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Layers, Wrench, X, Star, ExternalLink, ShieldCheck } from "lucide-react";
+import { Layers, Wrench, X, Star, ExternalLink, ShieldCheck, BookOpen } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import { useFavorites } from "@/lib/favorites";
 import { STRATEGY_STACK, ALL_LIBRARY, SHELF_FILTERS, LATEST_IDS } from "@/content/library";
@@ -134,11 +134,15 @@ function StackRung({ doc }: { doc: ContentItem }) {
           {open && (
             <div className="text-[11px] text-primary-dark leading-snug bg-primary-ghost rounded-inner px-2.5 py-2 mt-1.5">
               {doc.translation_line}
-              {doc.official_url && (
+              {doc.doc_class === "milestone" && doc.hosted_path ? (
+                <Link href={`/reader/${doc.id}`} className="ml-1 font-semibold text-primary underline underline-offset-2 whitespace-nowrap">
+                  Read it →
+                </Link>
+              ) : doc.official_url ? (
                 <a href={doc.official_url} target="_blank" rel="noopener noreferrer" className="ml-1 font-semibold text-primary underline underline-offset-2 whitespace-nowrap">
                   Read it →
                 </a>
-              )}
+              ) : null}
             </div>
           )}
         </div>
@@ -184,11 +188,20 @@ function DocCard({ doc }: { doc: ContentItem }) {
         {doc.issuer} · <span className="text-success-mid font-semibold">✓ {verifiedLabel(doc.verified_as_of)}</span>
       </p>
       <p className="text-[11px] text-gray-600 leading-snug mt-1.5">{doc.translation_line}</p>
-      {doc.official_url && (
+      {doc.doc_class === "milestone" && doc.hosted_path ? (
+        <span className="flex items-center gap-3 mt-1.5">
+          <Link href={`/reader/${doc.id}`} className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary">
+            Read it here <BookOpen size={11} />
+          </Link>
+          <a href={doc.official_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[11px] font-semibold text-gray-500">
+            Official source <ExternalLink size={11} />
+          </a>
+        </span>
+      ) : doc.official_url ? (
         <a href={doc.official_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary mt-1.5">
           Open official source <ExternalLink size={11} />
         </a>
-      )}
+      ) : null}
     </div>
   );
 }

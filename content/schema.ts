@@ -80,6 +80,11 @@ export interface ContentItem {
 
   // ─── Library fields (doc / site) ───────────────────────────────────────────
   provenance?: Provenance[];
+  // Milestone vs. Living (product-owner rule, FIX-1): milestone docs are static,
+  // signed, historic — hosted in-app at hosted_path with a prominent link to the
+  // official source. Living docs (regs, forms, hubs) are NEVER hosted; deep link only.
+  doc_class?: "milestone" | "living";
+  hosted_path?: string;       // /docs/<file>.pdf under public/ (milestones only)
   translation_line?: string;  // plain-language "what this means for you"
   issuer?: string;            // who published it (for the issuer·date meta line)
   issued?: string;            // ISO date the source was issued/effective (drives "Latest")

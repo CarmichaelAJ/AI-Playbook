@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "lint:lexicon": "node scripts/lint-lexicon.mjs",
-    "test:verbatim": "node scripts/test-verbatim.mjs"
+    "test:verbatim": "node scripts/test-verbatim.mjs",
+    "check:links": "node scripts/check-links.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.18.0",
