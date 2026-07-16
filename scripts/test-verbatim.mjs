@@ -7,8 +7,16 @@
 
 import fs from "node:fs";
 
-const md = fs.readFileSync("content-source/PLAYS-MVP-v1.md", "utf8");
-const ts = fs.readFileSync("content/plays/index.ts", "utf8");
+// content-source/ is the private working layer — local-only, never in git.
+// On machines without it (CI, fresh clones) this test skips rather than fails.
+if (!fs.existsSync("content-source/PLAYS-MVP-v1.md")) {
+  console.log("· Verbatim test skipped: content-source/ not present (private working layer).");
+  process.exit(0);
+}
+
+// Normalize CRLF → LF so the parse is line-ending agnostic (git autocrlf).
+const md = fs.readFileSync("content-source/PLAYS-MVP-v1.md", "utf8").replace(/\r\n/g, "\n");
+const ts = fs.readFileSync("content/plays/index.ts", "utf8").replace(/\r\n/g, "\n");
 
 // 1 · Source prompts: the blockquote under each "### PLAY N" heading.
 const srcPrompts = [];
