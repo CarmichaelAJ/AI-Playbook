@@ -14,7 +14,7 @@ const paths = [
     href: "/plays",
     icon: Layers,
     title: "Execute a task",
-    body: "Get the safe starting move for the situation in front of you — evaluations, awards, emails, tough conversations, and more. Copy a vetted starter prompt and go.",
+    body: "Get the safe starting move for the situation in front of you. Every play shows its moving parts — fill it in, run it, and check it before your name goes on it.",
     primary: true,
   },
   {

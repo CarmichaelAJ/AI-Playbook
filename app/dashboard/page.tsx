@@ -259,7 +259,7 @@ export default function HQPage() {
             <ShieldCheck size={15} className="text-warm flex-shrink-0" />
             <p className="text-[11px] leading-snug">
               <span className="font-bold text-warm">{PLAY_COUNT}</span> deep plays ·{" "}
-              <span className="font-bold text-warm">{SOURCE_COUNT}</span> official sources — every link verified &amp; dated.
+              <span className="font-bold text-warm">{SOURCE_COUNT}</span>{" "}official sources — every link verified &amp; dated.
             </p>
           </div>
         </ScrollReveal>

@@ -2,13 +2,14 @@
 
 import { useEffect, useRef } from "react";
 import {
-  Layers, Wrench, GraduationCap, X, Lightbulb, ExternalLink, Link2, ShieldCheck, PenLine,
+  Layers, Wrench, GraduationCap, X, Lightbulb, ExternalLink, Link2, ShieldCheck, PenLine, Building2,
 } from "lucide-react";
 import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
 
 // The three intent doors — the app routes by intent (Doctrine §4).
 const doors = [
-  { icon: Layers, label: "Execute a task", role: "Get a vetted starter prompt for the situation in front of you." },
+  { icon: Layers, label: "Execute a task", role: "Open a play, see its moving parts, fill it in, and run it on an approved tool." },
+  { icon: Building2, label: "Visit your HQ", role: "Your saved plays, the approved launchpads, and the official picture — dated and translated." },
   { icon: Wrench, label: "Find tools & data", role: "See what's approved and the full path to get in." },
   { icon: GraduationCap, label: "Learn how this works", role: "Short reads on working with AI, and where to go deeper." },
 ];
