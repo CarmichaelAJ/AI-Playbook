@@ -21,8 +21,11 @@ export default async function ReaderPage({ params }: { params: Promise<{ docId: 
     <div className="flex flex-col">
       {/* Header */}
       <div className="hero-af text-white px-5 pt-5 pb-5 overflow-hidden rounded-b-[24px]">
-        <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-on-dark hover:text-white mb-3">
-          <ArrowLeft size={13} /> Back to HQ
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-badge bg-white text-primary text-sm font-bold shadow-resting active:scale-[0.98] hover:bg-primary-ghost transition-all"
+        >
+          <ArrowLeft size={16} strokeWidth={2.6} /> Back to HQ
         </Link>
         <h1 className="font-display text-xl font-bold uppercase tracking-wider leading-tight mb-1">{doc.title}</h1>
         <p className="text-[11px] text-on-dark">
