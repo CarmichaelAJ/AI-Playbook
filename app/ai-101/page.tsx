@@ -172,7 +172,7 @@ export default function AI101Page() {
                 teaser="Ground answers in trusted documents instead of memory alone.">
                 <Body>
                   Retrieval-augmented generation lets a model pull in trusted documents at answer time instead of relying only
-                  on what it memorized. It&apos;s how you ground answers in your own sources and cut down on hallucination.
+                  on what it memorized. It&apos;s how you ground answers in your own sources and reduce hallucination.
                 </Body>
                 <Video src="https://www.youtube-nocookie.com/embed/UabBYexBD4k" title="Retrieval-Augmented Generation (RAG) explained" />
               </Accordion>
