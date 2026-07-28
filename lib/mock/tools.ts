@@ -102,7 +102,7 @@ export const TOOLS: Tool[] = [
     name: "GenAI.mil",
     one_liner: "The Department of War's official AI platform",
     description:
-      "One secure door to the Department's approved frontier AI tools — Google's Gemini for Government and xAI's Grok today, with a custom ChatGPT coming soon.",
+      "One secure door to the Department's approved frontier AI tools — Google's Gemini for Government today, with xAI's Grok and a custom ChatGPT coming soon.",
     section: "ai",
     badge: "Start Here",
     icon: "🛡️",
@@ -378,13 +378,15 @@ export const TOOLS: Tool[] = [
   },
 
   // ── Coming Soon ──────────────────────────────────────────────────────────
-  // Shipped unnamed by design (Q12): the official program name isn't public.
+  // PM adjudication 28 Jul 2026 (supersedes the Q12 unnamed treatment; log in
+  // DECISION-LOG): print the "AAA" acronym only — the expansion isn't public —
+  // and name Gemini Notebook as the underlying experience.
   {
     id: "t21",
-    name: "AI training for every Airman",
-    one_liner: "Announced by the CMSAF — official name pending",
+    name: "AAA",
+    one_liner: "AI training for every Airman — announced by the CMSAF",
     description:
-      "An enterprise AI schoolhouse arriving on GenAI.mil: it interviews you about your job, then builds a learning roadmap grounded only in approved sources, with quizzes, audio overviews, and mind maps.",
+      "An enterprise AI schoolhouse arriving on GenAI.mil, built on Gemini Notebook: it interviews you about your job, then builds a learning roadmap grounded only in approved sources, with quizzes, audio overviews, and mind maps.",
     section: "soon",
     icon: "🎓",
     status: "coming_soon",
@@ -399,7 +401,7 @@ export const TOOLS: Tool[] = [
     path_verified_on: VERIFIED,
     play_ids: [],
     soon_note:
-      "The official program name isn't public yet, so this card doesn't print one. The day it ships, the name, path, and a verified date land here.",
+      "\"AAA\" is the working name — the official expansion isn't public yet, so this card doesn't print one. The day it ships, the full name, path, and a verified date land here.",
   },
   {
     id: "t29",
