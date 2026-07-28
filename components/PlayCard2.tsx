@@ -105,7 +105,8 @@ export default function PlayCard2({ play }: { play: ContentItem }) {
   const runOn = play.run_on;
 
   return (
-    <div className="rounded-card shadow-resting overflow-hidden bg-white border border-silver-mid/50 transition-all duration-base ease-smooth hover:shadow-hover hover:border-primary/25">
+    // id anchor: tool cards deep-link here as /plays#<playId>
+    <div id={play.id} className="scroll-mt-4 rounded-card shadow-resting overflow-hidden bg-white border border-silver-mid/50 transition-all duration-base ease-smooth hover:shadow-hover hover:border-primary/25">
       {/* ── Collapsed header ── */}
       <div className="flex items-start gap-2 p-4">
         <button

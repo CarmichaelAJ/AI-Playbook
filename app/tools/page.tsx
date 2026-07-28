@@ -1,117 +1,299 @@
 "use client";
 
-import { useState, useRef, useLayoutEffect, useCallback } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import {
-  ExternalLink, Shield, Clock, Monitor, ChevronDown, ChevronUp, ArrowUpRight, ListChecks, CalendarClock,
+  ExternalLink, ChevronDown, ChevronUp, CreditCard, Clock, Check, CheckCircle2,
+  Hourglass, Copy, Layers, ShieldAlert,
 } from "lucide-react";
-import { TOOLS, USE_CASES, SECTIONS, type UseCase, type Section, type Tool } from "@/lib/mock/tools";
+import { TOOLS, SECTIONS, INTENTS, type Tool } from "@/lib/mock/tools";
+import { PLAYS } from "@/content/plays";
+import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
+import { useToolProgress } from "@/lib/toolProgress";
 import StarToggle from "@/components/StarToggle";
 
-// Every tool on this page is approved for official use. One badge, one meaning.
-const APPROVED_BADGE = {
-  label: "Approved for official use — confirm locally",
-  color: "bg-success-tint text-success-mid",
-};
+// A play card is a lesson; a tool card is a door. Collapsed rows are the shelf,
+// the expanded card is the door: one Open CTA, cleared-for line, checkable path
+// in, first move, and the plays that run on it.
 
-const sectionFilterLabel: Record<Section | "All", string> = {
-  All:        "All",
-  ai:         "AI",
-  automation: "Automation",
-  data:       "Data",
-  platforms:  "Platforms",
-  soon:       "Coming Soon",
-};
+const PLAY_TITLES: Record<string, string> = Object.fromEntries(
+  PLAYS.map((p) => [p.id, p.title]),
+);
 
-const USE_CASE_OPTIONS = (["All", ...USE_CASES] as (UseCase | "All")[]);
-const SECTION_OPTIONS = (["All", ...SECTIONS.map((s) => s.id)] as (Section | "All")[]);
+// Standing safety bar for AI-category doors only.
+const NEVER_PASTE_LINE =
+  "Never paste anything classified, unsanitized names, or personal information you wouldn't put in an email — check the platform's data rules for CUI.";
 
-function SegmentedFilter<T extends string>({
-  options,
-  labels,
-  active,
-  onChange,
-  pillColor = "bg-primary-dark",
-  activeTextColor = "text-white",
-}: {
-  options: T[];
-  labels?: Record<T, string>;
-  active: T;
-  onChange: (v: T) => void;
-  pillColor?: string;
-  activeTextColor?: string;
-}) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const [pill, setPill] = useState({ left: 0, width: 0 });
+const CHANGED_WINDOW_DAYS = 60;
 
-  const updatePill = useCallback(() => {
-    const idx = options.indexOf(active);
-    const btn = btnRefs.current[idx];
-    const track = trackRef.current;
-    if (!btn || !track) return;
-    const trackRect = track.getBoundingClientRect();
-    const btnRect = btn.getBoundingClientRect();
-    setPill({ left: btnRect.left - trackRect.left, width: btnRect.width });
-  }, [active, options]);
+function formatDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map((n) => parseInt(n, 10));
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${d} ${months[m - 1]} ${y}`;
+}
 
-  useLayoutEffect(() => { updatePill(); }, [updatePill]);
+function isRecentChange(tool: Tool): boolean {
+  if (!tool.changed_note) return false;
+  const age = Date.now() - new Date(tool.changed_note.date).getTime();
+  return age >= 0 && age <= CHANGED_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+}
 
+// ── Meta chips for THE PATH IN ────────────────────────────────────────────────
+function PathMetaChips({ tool }: { tool: Tool }) {
+  const chips: { icon: ReactNode; label: string }[] = [];
+  if (tool.cac_required) chips.push({ icon: <CreditCard size={10} />, label: "CAC sign-in" });
+  if (tool.wait_class === "none") chips.push({ icon: <Check size={10} />, label: "nothing to request" });
+  if (tool.wait_class === "minutes") chips.push({ icon: <Clock size={10} />, label: "access in minutes" });
+  if (tool.wait_class === "days") chips.push({ icon: <Clock size={10} />, label: "access can take days" });
   return (
-    <div ref={trackRef} className="seg-track">
-      <div
-        className={`seg-pill ${pillColor}`}
-        style={{ left: pill.left, width: pill.width }}
-      />
-      {options.map((opt, i) => (
-        <button
-          key={opt}
-          ref={el => { btnRefs.current[i] = el; }}
-          onClick={() => onChange(opt)}
-          className={`seg-btn ${active === opt ? activeTextColor : "text-gray-500"}`}
+    <div className="flex items-center gap-1.5 flex-wrap mb-2">
+      {chips.map((c) => (
+        <span
+          key={c.label}
+          className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-badge bg-caution-tint text-caution-mid"
         >
-          {labels ? labels[opt] : opt}
-        </button>
+          {c.icon} {c.label}
+        </span>
       ))}
     </div>
   );
 }
 
-function ToolCard({ tool }: { tool: Tool }) {
-  const [expanded, setExpanded] = useState(false);
+// ── THE PATH IN — checkable steps with persisted state ───────────────────────
+function PathIn({
+  tool,
+  checkedSteps,
+  onToggleStep,
+}: {
+  tool: Tool;
+  checkedSteps: number[];
+  onToggleStep: (i: number) => void;
+}) {
+  return (
+    <div className="mt-3 rounded-inner border border-caution/30 bg-caution-tint/30 p-3">
+      <p className="text-[10px] font-bold uppercase tracking-wider text-caution-mid mb-2">The path in</p>
+      <PathMetaChips tool={tool} />
+      <ol className="flex flex-col gap-1.5">
+        {tool.access_path.map((s, i) => {
+          const checked = checkedSteps.includes(i);
+          return (
+            <li key={i}>
+              <button
+                onClick={() => onToggleStep(i)}
+                className="flex items-start gap-2 text-left w-full min-h-[28px]"
+                aria-pressed={checked}
+              >
+                <span
+                  className={`flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center mt-0.5 transition-colors ${
+                    checked ? "bg-success border-success text-white" : "bg-white border-silver-mid text-transparent"
+                  }`}
+                >
+                  <Check size={11} strokeWidth={3} />
+                </span>
+                <span className={`text-xs leading-snug ${checked ? "text-gray-400 line-through" : "text-gray-700"}`}>
+                  {s.step}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+      <div className="mt-2.5 flex items-center justify-between gap-2 flex-wrap">
+        {tool.path_pending_verification ? (
+          <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-badge bg-caution-tint text-caution-mid">
+            <Hourglass size={10} /> exact steps pending verification
+          </span>
+        ) : (
+          <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-badge bg-success-tint text-success-mid">
+            <CheckCircle2 size={10} /> path verified {formatDate(tool.path_verified_on)}
+          </span>
+        )}
+        <a
+          href={SUGGEST_PLAY_FORM_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[10px] font-semibold text-primary underline underline-offset-2"
+        >
+          Door moved on you? Report it →
+        </a>
+      </div>
+    </div>
+  );
+}
 
-  const live = !tool.inDevelopment && !!tool.url;
-  const workstationOnly = !tool.accessibleMobile;
+// ── FIRST MOVE — neutral, with optional copyable starter prompt ──────────────
+function FirstMove({ tool }: { tool: Tool }) {
+  const [copied, setCopied] = useState(false);
+  if (!tool.first_move) return null;
+  const { text, copyable } = tool.first_move;
+
+  const copy = async () => {
+    if (!copyable) return;
+    try {
+      await navigator.clipboard.writeText(copyable);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      /* clipboard unavailable — no feedback */
+    }
+  };
 
   return (
-    <div className="bg-white rounded-card shadow-resting border border-silver-mid/50 hover:shadow-hover hover:border-primary/25 overflow-hidden transition-all duration-base ease-smooth">
-      {/* Collapsed header — name, tagline, badge; content toggles expand */}
-      <div className="flex items-start gap-2 p-5">
+    <div className="mt-3">
+      <p className="text-[10px] font-bold uppercase tracking-wider text-silver mb-1.5">First move</p>
+      <p className="text-xs text-gray-600 leading-relaxed">{text}</p>
+      {copyable && (
+        <div className="mt-2 rounded-inner bg-primary-deeper text-white p-3">
+          <p className="text-[11px] leading-relaxed font-mono">{copyable}</p>
+          <button
+            onClick={copy}
+            className={`mt-2 flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-badge transition-colors ${
+              copied ? "bg-success text-white" : "bg-white/15 text-white active:bg-white/25"
+            }`}
+          >
+            {copied ? <Check size={11} /> : <Copy size={11} />}
+            {copied ? "Copied" : "Copy prompt"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── RUNS THESE PLAYS — deep-link chips into /plays ───────────────────────────
+function RunsThesePlays({ tool }: { tool: Tool }) {
+  return (
+    <div className="mt-3">
+      <p className="text-[10px] font-bold uppercase tracking-wider text-silver mb-1.5">Runs these plays</p>
+      {tool.play_ids.length > 0 ? (
+        <div className="flex flex-wrap gap-1.5">
+          {tool.play_ids.map((pid) => (
+            <a
+              key={pid}
+              href={`/plays#${pid}`}
+              className="flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-badge bg-primary-ghost text-primary border border-primary/20 active:bg-primary-tint transition-colors"
+            >
+              <Layers size={10} /> {PLAY_TITLES[pid] ?? pid}
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p className="text-xs text-gray-500 italic leading-snug">{tool.no_plays_line}</p>
+      )}
+    </div>
+  );
+}
+
+// ── Expanded card — the door ─────────────────────────────────────────────────
+function ExpandedTool({ tool }: { tool: Tool }) {
+  const { checkedSteps, launcherMode, toggleStep, markOpened } = useToolProgress(tool.id);
+  // Launcher mode: returning users get CTA + cleared-for; path folds away.
+  const [pathOpen, setPathOpen] = useState(false);
+  const showPath = !launcherMode || pathOpen;
+
+  const onToggleStep = useCallback(
+    (i: number) => toggleStep(i, tool.access_path.length),
+    [toggleStep, tool.access_path.length],
+  );
+
+  return (
+    <div className="px-4 pb-4 border-t border-silver-mid/40">
+      <p className="text-xs text-gray-600 mt-3 leading-relaxed">{tool.description}</p>
+
+      {tool.changed_note && isRecentChange(tool) && (
+        <p className="mt-2 text-[11px] leading-snug text-caution-mid">
+          <span className="font-bold">Changed {formatDate(tool.changed_note.date)}:</span> {tool.changed_note.text}
+        </p>
+      )}
+
+      {/* Primary CTA — the biggest element on the card */}
+      <a
+        href={tool.launch_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={markOpened}
+        className="mt-3 w-full flex items-center justify-center gap-2 py-3.5 rounded-inner text-base font-bold bg-primary text-white active:bg-primary-dark transition-colors"
+      >
+        <ExternalLink size={17} /> Open {tool.name} →
+      </a>
+
+      {/* CLEARED FOR — the red accent */}
+      <div className="mt-3 rounded-inner border-l-[3px] border-danger bg-danger-tint/30 px-3 py-2.5">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-danger-mid mb-1">Cleared for</p>
+        <p className="text-xs text-gray-700 leading-snug">{tool.cleared_line}</p>
+      </div>
+
+      {/* THE PATH IN — folded behind an accordion once this device knows the way */}
+      {launcherMode ? (
+        <div className="mt-3">
+          <button
+            onClick={() => setPathOpen((o) => !o)}
+            className="flex items-center gap-1.5 text-[11px] font-semibold text-caution-mid min-h-[32px]"
+            aria-expanded={pathOpen}
+          >
+            {pathOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+            First time here? See the path in
+          </button>
+          {showPath && <PathIn tool={tool} checkedSteps={checkedSteps} onToggleStep={onToggleStep} />}
+        </div>
+      ) : (
+        <PathIn tool={tool} checkedSteps={checkedSteps} onToggleStep={onToggleStep} />
+      )}
+
+      <FirstMove tool={tool} />
+      <RunsThesePlays tool={tool} />
+
+      {/* AI doors only: the standing safety bar */}
+      {tool.section === "ai" && (
+        <p className="mt-3 flex items-start gap-1.5 text-[10px] leading-snug text-danger-mid bg-danger-tint/40 rounded-inner px-2.5 py-2">
+          <ShieldAlert size={12} className="flex-shrink-0 mt-px" /> {NEVER_PASTE_LINE}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ── One tool — collapsed dense row, expandable to the door ───────────────────
+function ToolRow({ tool, highlighted }: { tool: Tool; highlighted: boolean }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div
+      id={`tool-row-${tool.id}`}
+      className={`bg-white rounded-card shadow-resting border overflow-hidden transition-all duration-base ease-smooth scroll-mt-4 ${
+        highlighted ? "border-warm ring-2 ring-warm/50" : "border-silver-mid/50 hover:border-primary/25 hover:shadow-hover"
+      }`}
+    >
+      <div className="flex items-center gap-2 pl-4 pr-2.5">
         <button
           onClick={() => setExpanded((e) => !e)}
-          className="flex items-start gap-3 flex-1 min-w-0 text-left"
+          className="flex items-center gap-3 flex-1 min-w-0 text-left py-3 min-h-[48px]"
           aria-expanded={expanded}
         >
-          <span className="text-2xl leading-none mt-0.5">{tool.icon}</span>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap mb-0.5">
-              <h3 className="text-sm font-bold text-primary-dark">{tool.name}</h3>
-              {tool.badge && (
-                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary text-white uppercase tracking-wide">
-                  {tool.badge}
-                </span>
-              )}
-            </div>
-            <p className="text-[11px] text-primary font-semibold">{tool.tagline}</p>
-          </div>
+          <span className="text-xl leading-none">{tool.icon}</span>
+          <span className="flex items-center gap-2 flex-wrap min-w-0">
+            <span className="text-sm font-bold text-primary-dark">{tool.name}</span>
+            {tool.badge && (
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary text-white uppercase tracking-wide">
+                {tool.badge}
+              </span>
+            )}
+            {isRecentChange(tool) && (
+              <span
+                className="w-2 h-2 rounded-full bg-caution flex-shrink-0"
+                title={`Changed ${formatDate(tool.changed_note!.date)}`}
+                aria-label="Recently changed"
+              />
+            )}
+          </span>
         </button>
 
-        <div className="flex items-center gap-0.5 flex-shrink-0 -mr-1.5">
-          <StarToggle item={{ type: "tool", id: tool.id, title: tool.name, url: tool.url }} />
+        <div className="flex items-center gap-0.5 flex-shrink-0">
+          <StarToggle item={{ type: "tool", id: tool.id, title: tool.name, url: tool.launch_url }} />
           <button
             onClick={() => setExpanded((e) => !e)}
             aria-label={expanded ? "Collapse tool" : "Expand tool"}
             aria-expanded={expanded}
-            className="p-1.5 text-gray-400 hover:text-primary transition-colors"
+            className="p-2.5 text-gray-400 hover:text-primary transition-colors"
           >
             {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
@@ -119,86 +301,42 @@ function ToolCard({ tool }: { tool: Tool }) {
       </div>
 
       {expanded && (
-        <div className="px-5 pb-5 border-t border-silver-mid/40">
-          {/* What it is */}
-          <p className="text-xs text-gray-600 mt-3 leading-relaxed">{tool.whatItIs}</p>
+        <>
+          {/* Expanded header carries the one-liner the row no longer shows */}
+          <p className="px-4 -mt-1 pb-2 text-[11px] text-primary font-semibold">{tool.one_liner}</p>
+          <ExpandedTool tool={tool} />
+        </>
+      )}
+    </div>
+  );
+}
 
-          {/* Authorization — linked to source, never asserted */}
-          <div className="mt-3 flex items-start gap-2">
-            <Shield size={14} className="flex-shrink-0 mt-0.5 text-success-mid" />
-            <p className="text-xs text-primary-dark leading-snug">
-              {tool.authorization.label}{" "}
-              {tool.authorization.sourceUrl ? (
-                <a
-                  href={tool.authorization.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-0.5 text-primary font-semibold underline underline-offset-2"
-                >
-                  Source <ArrowUpRight size={11} />
-                </a>
-              ) : (
-                <span className="text-gray-400">Confirm with your local guidance.</span>
-              )}
-            </p>
-          </div>
-
-          {/* Use cases */}
-          <div className="flex items-center gap-2 mt-3 flex-wrap">
-            <span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-badge ${APPROVED_BADGE.color}`}>
-              <Shield size={10} />
-              {APPROVED_BADGE.label}
-            </span>
-            {tool.useCases.map((uc) => (
-              <span key={uc} className="text-[10px] font-medium px-2 py-1 rounded-badge bg-gray-100 text-gray-500">
-                {uc}
-              </span>
-            ))}
-          </div>
-
-          {/* The full access path */}
-          <div className="mt-4">
-            <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-silver mb-1.5">
-              <ListChecks size={12} /> How to get in
-            </p>
-            <ol className="flex flex-col gap-1.5">
-              {tool.accessPath.map((step, i) => (
-                <li key={i} className="flex gap-2 text-xs text-gray-600 leading-snug">
-                  <span className="flex-shrink-0 w-4 h-4 rounded-full bg-primary/10 text-primary text-[9px] font-bold flex items-center justify-center mt-0.5">
-                    {i + 1}
-                  </span>
-                  <span>{step}</span>
-                </li>
-              ))}
-            </ol>
-            <p className="flex items-center gap-1.5 text-[10px] text-gray-400 mt-2">
-              <CalendarClock size={11} /> Access path — draft, pending verification · updated {tool.accessVerified}
-            </p>
-          </div>
-
-          {workstationOnly && (
-            <p className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-400 mt-3">
-              <Monitor size={11} /> Open this one from your government workstation.
-            </p>
-          )}
-
-          {/* Open the tool */}
-          <div className="mt-3">
-            {live ? (
-              <a
-                href={tool.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-inner text-sm font-semibold bg-primary text-white active:bg-primary-dark transition-colors"
-              >
-                <ExternalLink size={15} /> Open tool
-              </a>
-            ) : (
-              <span className="w-full flex items-center justify-center gap-2 py-2.5 rounded-inner text-sm font-semibold bg-gray-100 text-gray-400 cursor-not-allowed">
-                <Clock size={15} /> Coming soon
-              </span>
-            )}
-          </div>
+// ── Coming Soon — muted rows, no stars, expandable honest note ───────────────
+function SoonRow({ tool }: { tool: Tool }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="bg-silver-tint/60 rounded-card border border-silver-mid/40 overflow-hidden">
+      <button
+        onClick={() => setExpanded((e) => !e)}
+        className="w-full flex items-center gap-3 pl-4 pr-2.5 py-3 min-h-[48px] text-left"
+        aria-expanded={expanded}
+      >
+        <span className="text-xl leading-none opacity-60">{tool.icon}</span>
+        <span className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
+          <span className="text-sm font-bold text-gray-500">{tool.name}</span>
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-gray-200 text-gray-500 uppercase tracking-wide">
+            Coming Soon
+          </span>
+        </span>
+        <span className="p-2 text-gray-400">
+          {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </span>
+      </button>
+      {expanded && (
+        <div className="px-4 pb-3 border-t border-silver-mid/40">
+          <p className="text-[11px] text-gray-500 font-semibold mt-2.5">{tool.one_liner}</p>
+          <p className="text-xs text-gray-600 leading-relaxed mt-1.5">{tool.description}</p>
+          <p className="text-xs text-gray-700 leading-relaxed mt-2 font-medium">{tool.soon_note}</p>
         </div>
       )}
     </div>
@@ -206,43 +344,33 @@ function ToolCard({ tool }: { tool: Tool }) {
 }
 
 export default function ToolsPage() {
-  const [activeSection, setActiveSection] = useState<Section | "All">("All");
-  const [activeUseCase, setActiveUseCase] = useState<UseCase | "All">("All");
-  const [fading, setFading] = useState(false);
-  const [displaySection, setDisplaySection] = useState<Section | "All">("All");
-  const [displayUseCase, setDisplayUseCase] = useState<UseCase | "All">("All");
+  const [activeIntent, setActiveIntent] = useState<string | null>(null);
 
-  const applyFilter = useCallback((sec: Section | "All", uc: UseCase | "All") => {
-    setFading(true);
-    setTimeout(() => {
-      setDisplaySection(sec);
-      setDisplayUseCase(uc);
-      setFading(false);
-    }, 130);
-  }, []);
+  const highlightedIds = useMemo(() => {
+    if (!activeIntent) return new Set<string>();
+    return new Set(INTENTS.find((i) => i.id === activeIntent)?.toolIds ?? []);
+  }, [activeIntent]);
 
-  const handleSection = (s: Section | "All") => {
-    setActiveSection(s);
-    applyFilter(s, activeUseCase);
+  const handleIntent = (id: string) => {
+    if (activeIntent === id) {
+      setActiveIntent(null);
+      return;
+    }
+    setActiveIntent(id);
+    // Scroll to the first matching live row, in section render order.
+    const toolIds = INTENTS.find((i) => i.id === id)?.toolIds ?? [];
+    const ordered = SECTIONS.flatMap((s) => TOOLS.filter((t) => t.section === s.id));
+    const first = ordered.find((t) => toolIds.includes(t.id));
+    if (first) {
+      document.getElementById(`tool-row-${first.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   };
 
-  const handleUseCase = (u: UseCase | "All") => {
-    setActiveUseCase(u);
-    applyFilter(activeSection, u);
-  };
-
-  const matchesFilters = (t: Tool) => {
-    const matchesSection = displaySection === "All" || t.section === displaySection;
-    const matchesUseCase = displayUseCase === "All" || t.useCases.includes(displayUseCase);
-    return matchesSection && matchesUseCase;
-  };
-
-  const filtered = TOOLS.filter(matchesFilters);
-
-  // Group surviving tools by section, preserving SECTIONS order and dropping empties.
-  const groupedSections = SECTIONS
-    .map((s) => ({ ...s, tools: filtered.filter((t) => t.section === s.id) }))
-    .filter((s) => s.tools.length > 0);
+  const liveSections = SECTIONS.filter((s) => s.id !== "soon").map((s) => ({
+    ...s,
+    tools: TOOLS.filter((t) => t.section === s.id && t.status === "live"),
+  }));
+  const soonTools = TOOLS.filter((t) => t.status === "coming_soon");
 
   return (
     <div className="flex flex-col">
@@ -258,69 +386,66 @@ export default function ToolsPage() {
           Tools
         </h1>
         <p className="text-sm text-on-dark">
-          Every tool here is approved for official use. Open one to see what it is, who it&apos;s cleared for, and the full path to get in.
+          Every tool here is approved for official use. Each card is a door: open it, see what it&apos;s cleared for,
+          and walk the path in.
         </p>
       </div>
 
-      {/* Category filter */}
+      {/* Router — "I want to…" intent chips (replaces both filter rows) */}
       <div className="px-4 pt-4">
-        <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">Filter by category</p>
-        <div className="overflow-x-auto">
-          <SegmentedFilter
-            options={SECTION_OPTIONS}
-            labels={sectionFilterLabel}
-            active={activeSection}
-            onChange={handleSection}
-            pillColor="bg-primary"
-            activeTextColor="text-white"
-          />
+        <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">I want to…</p>
+        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-4 px-4">
+          {INTENTS.map((intent) => (
+            <button
+              key={intent.id}
+              onClick={() => handleIntent(intent.id)}
+              className={`flex-shrink-0 text-xs font-semibold px-3 py-2 rounded-full border transition-colors min-h-[36px] ${
+                activeIntent === intent.id
+                  ? "bg-warm border-warm text-primary-dark"
+                  : "bg-white border-silver-mid/60 text-gray-600 active:bg-warm-tint"
+              }`}
+            >
+              {intent.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Use case filter */}
-      <div className="px-4 pt-3">
-        <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">Filter by use case</p>
-        <div className="overflow-x-auto pb-1">
-          <SegmentedFilter
-            options={USE_CASE_OPTIONS}
-            active={activeUseCase}
-            onChange={handleUseCase}
-            pillColor="bg-warm"
-            activeTextColor="text-primary-dark"
-          />
-        </div>
+      {/* Receipts line — counts computed from data */}
+      <div className="px-4 pt-2 pb-1">
+        <p className="text-xs text-gray-500 font-medium">
+          {TOOLS.length} tools · every path dated · re-checked monthly
+        </p>
       </div>
 
-      {/* Count */}
-      <div className="px-4 pt-3 pb-1">
-        <p className="text-xs text-gray-500 font-medium">{filtered.length} tool{filtered.length !== 1 ? "s" : ""}</p>
-      </div>
-
-      {/* Tool cards, grouped by section */}
-      <div className={`px-4 flex flex-col gap-5 pb-4 filter-grid ${fading ? "fading" : ""}`}>
-        {groupedSections.map((section) => (
+      {/* Tool rows, grouped by section */}
+      <div className="px-4 flex flex-col gap-5 pb-4 pt-1">
+        {liveSections.map((section) => (
           <div key={section.id}>
             <div className="mb-2">
               <h2 className="text-xs font-bold text-primary-dark uppercase tracking-wider">{section.label}</h2>
               <p className="text-[11px] text-gray-500 mt-0.5">{section.blurb}</p>
             </div>
-            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            <div className="flex flex-col gap-2">
               {section.tools.map((tool) => (
-                <ToolCard key={tool.id} tool={tool} />
+                <ToolRow key={tool.id} tool={tool} highlighted={highlightedIds.has(tool.id)} />
               ))}
             </div>
           </div>
         ))}
 
-        {filtered.length === 0 && (
-          <div className="text-center py-10 text-gray-400">
-            <p className="text-sm font-medium">No tools match your filters</p>
-            <button
-              onClick={() => { handleSection("All"); handleUseCase("All"); }}
-              className="text-xs text-primary font-semibold mt-2"
-            >
-              Clear filters
-            </button>
+        {/* Coming Soon — compressed, muted, honest */}
+        {soonTools.length > 0 && (
+          <div>
+            <div className="mb-2">
+              <h2 className="text-xs font-bold text-primary-dark uppercase tracking-wider">Coming Soon</h2>
+              <p className="text-[11px] text-gray-500 mt-0.5">Announced and on the way. Verify availability locally.</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              {soonTools.map((tool) => (
+                <SoonRow key={tool.id} tool={tool} />
+              ))}
+            </div>
           </div>
         )}
 
