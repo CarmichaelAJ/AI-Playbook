@@ -24,7 +24,7 @@ const SKIP = [/node_modules/, /\.next/, /content-source/, /scripts/];
 
 // Each rule: name, regex, and an optional per-line allowlist test.
 const RULES = [
-  { name: "impact-level jargon (IL2/IL4/IL5/IL6)", re: /\bIL[2456]\b/ },
+  { name: "impact-level jargon (IL2/IL4/IL5/IL6/IL7)", re: /\bIL[24567]\b/ },
   // ── Sprint 2 additions (Tool Card 2.0 lexicon corrections C1–C6) ──
   { name: '"DoD Enterprise AI Platform" (say: the Department of War\'s official AI platform)', re: /\bDoD Enterprise AI Platform\b/i },
   { name: '"NIPR machine" (say: your government computer)', re: /\bNIPR machine\b/i },

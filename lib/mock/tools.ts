@@ -102,7 +102,7 @@ export const TOOLS: Tool[] = [
     name: "GenAI.mil",
     one_liner: "The Department of War's official AI platform",
     description:
-      "One secure door to the Department's approved frontier AI tools — Google's Gemini for Government and xAI's Grok today, with a custom ChatGPT arriving now.",
+      "One secure door to the Department's approved frontier AI tools — Google's Gemini for Government and xAI's Grok today, with a custom ChatGPT coming soon.",
     section: "ai",
     badge: "Start Here",
     icon: "🛡️",
@@ -130,8 +130,8 @@ export const TOOLS: Tool[] = [
       "paperwork-response", "email-that-gets-answered",
     ],
     changed_note: {
-      date: "2026-07-15",
-      text: "GAMECHANGER now lives inside GenAI.mil — turn it on from the tools panel there instead of visiting it separately.",
+      date: "2026-06-26",
+      text: "GAMECHANGER moved onto GenAI.mil effective 26 Jun 2026 — turn it on from the tools panel there instead of visiting it separately.",
     },
   },
   {
@@ -228,20 +228,21 @@ export const TOOLS: Tool[] = [
     status: "live",
     launch_url: "https://envision.af.mil",
     cleared_line:
-      "Open to Airmen on the government network — logging in from your government computer is the access.",
+      "The Air Force's enterprise data and analytics environment — you'll need to request an account before first use.",
     access_path: [
-      { step: "On your government computer, go to Envision." },
-      { step: "Sign in with your CAC — no separate request for basic access." },
+      { step: "Request an Envision account through your unit's process — expect a PII certification step." },
+      { step: "Once approved, sign in from your government computer." },
       { step: "Explore the connected DAF data sources for your functional area." },
     ],
     cac_required: true,
-    wait_class: "none",
+    wait_class: "days",
     path_verified_on: VERIFIED,
     path_pending_verification: true,
     first_move: {
       text: "Browse the data catalog for your functional area before building anything — knowing what's connected is half the value.",
     },
-    play_ids: ["email-that-gets-answered"],
+    play_ids: [],
+    no_plays_line: DATA_PLAYS_LINE,
   },
   {
     id: "t24",

@@ -19,9 +19,9 @@ const PLAY_TITLES: Record<string, string> = Object.fromEntries(
   PLAYS.map((p) => [p.id, p.title]),
 );
 
-// Standing safety bar for AI-category doors only.
+// Standing safety bar for AI-category doors only — LEXICON §6 blessed line, verbatim.
 const NEVER_PASTE_LINE =
-  "Never paste anything classified, unsanitized names, or personal information you wouldn't put in an email — check the platform's data rules for CUI.";
+  "Never paste: names you haven't sanitized, anything sensitive you haven't cleared, anything classified. When in doubt, leave it out.";
 
 const CHANGED_WINDOW_DAYS = 60;
 
