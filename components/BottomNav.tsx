@@ -10,7 +10,10 @@ const tabs = [
   { href: "/plays", label: "Plays", icon: Layers },
   { href: "/dashboard", label: "HQ", icon: Building2 },
   { href: "/tools", label: "Tools", icon: Wrench },
-  { href: "/ai-101", label: "AI 101", icon: GraduationCap },
+  // Tab name locked as "AI & Automation" (Q4, 26 Jul). The bar carries five tabs,
+  // so the label is abbreviated here and spelled out in the page H1.
+  // FLAGGED: the abbreviation is a product-owner call — swap if another short form reads better.
+  { href: "/ai-automation", label: "AI & Auto", icon: GraduationCap },
 ];
 
 export default function BottomNav() {

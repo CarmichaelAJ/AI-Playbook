@@ -25,10 +25,10 @@ const paths = [
     primary: false,
   },
   {
-    href: "/ai-101",
+    href: "/ai-automation",
     icon: GraduationCap,
-    title: "Learn how this works",
-    body: "Short reads on what AI is, how to work with it, and how to go deeper. You can't break anything here.",
+    title: "Decide how to attack it",
+    body: "Twenty seconds to the right move — chat session, agent, automation, or fix the process first. Then go as deep as you have time for.",
     primary: false,
   },
 ];
@@ -176,7 +176,7 @@ export default function HomePage() {
           <ScrollReveal>
             <p className="text-[11px] text-gray-500 mt-2 leading-snug">
               You choose how deep to go — every play runs today at Level 1. See the depth ladder in{" "}
-              <Link href="/ai-101" className="text-primary font-semibold underline underline-offset-2">AI 101</Link>.
+              <Link href="/ai-automation" className="text-primary font-semibold underline underline-offset-2">AI &amp; Automation</Link>.
             </p>
           </ScrollReveal>
         </section>
