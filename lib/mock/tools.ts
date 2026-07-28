@@ -226,7 +226,8 @@ export const TOOLS: Tool[] = [
     badge: "DAF Enterprise",
     icon: "🔭",
     status: "live",
-    launch_url: "https://envision.af.mil",
+    // D27: ships URL-less until the PM verifies the real address from a workstation.
+    launch_url: "",
     cleared_line:
       "The Air Force's enterprise data and analytics environment — you'll need to request an account before first use.",
     access_path: [

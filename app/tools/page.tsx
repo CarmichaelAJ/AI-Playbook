@@ -206,15 +206,21 @@ function ExpandedTool({ tool }: { tool: Tool }) {
       )}
 
       {/* Primary CTA — the biggest element on the card */}
-      <a
-        href={tool.launch_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={markOpened}
-        className="mt-3 w-full flex items-center justify-center gap-2 py-3.5 rounded-inner text-base font-bold bg-primary text-white active:bg-primary-dark transition-colors"
-      >
-        <ExternalLink size={17} /> Open {tool.name} →
-      </a>
+      {tool.launch_url ? (
+        <a
+          href={tool.launch_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={markOpened}
+          className="mt-3 w-full flex items-center justify-center gap-2 py-3.5 rounded-inner text-base font-bold bg-primary text-white active:bg-primary-dark transition-colors"
+        >
+          <ExternalLink size={17} /> Open {tool.name} →
+        </a>
+      ) : (
+        <span className="mt-3 w-full flex items-center justify-center gap-2 py-3.5 rounded-inner text-base font-bold bg-gray-100 text-gray-400 cursor-not-allowed">
+          <Hourglass size={17} /> Link being verified — check back
+        </span>
+      )}
 
       {/* CLEARED FOR — the red accent */}
       <div className="mt-3 rounded-inner border-l-[3px] border-danger bg-danger-tint/30 px-3 py-2.5">
