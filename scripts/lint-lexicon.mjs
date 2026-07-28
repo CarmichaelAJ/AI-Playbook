@@ -24,7 +24,19 @@ const SKIP = [/node_modules/, /\.next/, /content-source/, /scripts/];
 
 // Each rule: name, regex, and an optional per-line allowlist test.
 const RULES = [
-  { name: "impact-level jargon (IL2/IL4/IL5)", re: /\bIL[245]\b/ },
+  { name: "impact-level jargon (IL2/IL4/IL5/IL6/IL7)", re: /\bIL[24567]\b/ },
+  // ── Sprint 2 additions (Tool Card 2.0 lexicon corrections C1–C6) ──
+  { name: '"DoD Enterprise AI Platform" (say: the Department of War\'s official AI platform)', re: /\bDoD Enterprise AI Platform\b/i },
+  { name: '"NIPR machine" (say: your government computer)', re: /\bNIPR machine\b/i },
+  {
+    name: '"AI for All Airmen" (program name not public — ships unnamed)',
+    re: /\bAI for All Airmen\b/i,
+    // FLAGGED for PM: app/ai-101 still prints the old name but is out of Sprint 2
+    // scope ("do not touch AI 101"). Exception removed when ai-101 is reworded.
+    allow: (_line, file) => /^app[\\/]ai-101[\\/]/.test(file),
+  },
+  { name: '"personal AI tutor" (unverified framing)', re: /\bpersonal AI tutor\b/i },
+  { name: '"pick a model" (say: pick an AI tool)', re: /\bpick a model\b/i },
   { name: "FedRAMP jargon", re: /\bFedRAMP\b/i },
   { name: "CAC-gated jargon", re: /\bCAC-gated\b/i },
   { name: '"leverage"', re: /\bleverage[sd]?\b/i },
@@ -60,7 +72,7 @@ function scanFile(file) {
     if (COMMENT_LINE.test(line)) return;
     for (const rule of RULES) {
       if (rule.re.test(line)) {
-        if (rule.allow && rule.allow(line)) continue;
+        if (rule.allow && rule.allow(line, rel)) continue;
         violations++;
         console.log(`${rel}:${i + 1}  [${rule.name}]`);
         console.log(`    ${line.trim().slice(0, 160)}`);
