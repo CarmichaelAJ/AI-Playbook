@@ -399,7 +399,7 @@ export default function ToolsPage() {
             <button
               key={intent.id}
               onClick={() => handleIntent(intent.id)}
-              className={`flex-shrink-0 text-xs font-semibold px-3 py-2 rounded-full border transition-colors min-h-[36px] ${
+              className={`flex-shrink-0 text-xs font-semibold px-3 py-2 rounded-full border transition-colors min-h-[44px] ${
                 activeIntent === intent.id
                   ? "bg-warm border-warm text-primary-dark"
                   : "bg-white border-silver-mid/60 text-gray-600 active:bg-warm-tint"

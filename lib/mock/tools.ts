@@ -279,7 +279,7 @@ export const TOOLS: Tool[] = [
     badge: "M365",
     icon: "📋",
     status: "live",
-    launch_url: "https://www.microsoft365.us",
+    launch_url: "https://portal.office365.us",
     cleared_line: DAF365_CLEARED,
     access_path: [
       { step: "Sign in to DAF365 with your government account." },
@@ -333,7 +333,7 @@ export const TOOLS: Tool[] = [
     badge: "M365",
     icon: "🗂️",
     status: "live",
-    launch_url: "https://www.microsoft365.us",
+    launch_url: "https://portal.office365.us",
     cleared_line: DAF365_CLEARED,
     access_path: [
       { step: "Sign in to DAF365 with your government account." },
