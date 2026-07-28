@@ -76,8 +76,8 @@ export interface Intent {
 
 export const INTENTS: Intent[] = [
   { id: "write",     label: "write",             toolIds: ["t1", "t15"] },
-  { id: "research",  label: "research",          toolIds: ["t1", "t15", "t14"] },
-  { id: "track",     label: "track data",        toolIds: ["t25", "t27", "t26"] },
+  { id: "research",  label: "research",          toolIds: ["t1", "t15"] },
+  { id: "track",     label: "track data",        toolIds: ["t25", "t27", "t26", "t14"] },
   { id: "automate",  label: "automate",          toolIds: ["t22"] },
   { id: "dashboard", label: "build a dashboard", toolIds: ["t24", "t14"] },
   { id: "form",      label: "make a form",       toolIds: ["t28", "t23"] },
@@ -221,7 +221,7 @@ export const TOOLS: Tool[] = [
     name: "Envision",
     one_liner: "The Air Force's enterprise data & analytics platform",
     description:
-      "Connects DAF data sources so you can build analysis, apps, and AI grounded on real data — the most powerful platform here for data-driven work. Basic access is just logging in.",
+      "Not a chat tool — a live, connected picture of Air Force data, fed by systems of record that update constantly. You can chain raw data into ontology objects that show real dependencies — a tail number links to its maintenance actions, the equipment those need, and that equipment's source — then build apps, dashboards, and AI assistants grounded on that data (teams have already built an HR assistant that answers from official publications and myFSS posts).",
     section: "data",
     badge: "DAF Enterprise",
     icon: "🔭",
