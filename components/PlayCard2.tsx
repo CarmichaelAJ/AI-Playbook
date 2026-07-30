@@ -3,12 +3,14 @@
 import { useState } from "react";
 import {
   ChevronDown, ChevronUp, Copy, Check, Zap, Clock, ShieldAlert,
-  ArrowUpRight, Info, Plug, TrendingUp,
+  ArrowUpRight, Info, PanelRightOpen, Plug, TrendingUp,
 } from "lucide-react";
 import { assemblePrompt, type ContentItem } from "@/content/schema";
 import { categoryLabel } from "@/content/categories";
 import { markPlayRun } from "@/lib/favorites";
 import StarToggle from "@/components/StarToggle";
+import ResponsiveDetailPanel from "@/components/ResponsiveDetailPanel";
+import ReportAccessButton from "@/components/ReportAccessButton";
 
 // ─── The five anatomy segments, color-coded from the app's own tokens ─────────
 // (Not the mockup's raw hexes — these are the existing #003087 / tech / caution /
@@ -143,14 +145,23 @@ export default function PlayCard2({ play }: { play: ContentItem }) {
             aria-expanded={expanded}
             className="p-1.5 text-gray-400 hover:text-primary transition-colors"
           >
-            {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            <span className="lg:hidden">
+              {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </span>
+            <PanelRightOpen size={16} className="hidden lg:block" />
           </button>
         </div>
       </div>
 
       {/* ── Expanded body ── */}
       {expanded && seg && (
-        <div className="px-4 pb-4 border-t border-silver-mid/40">
+        <ResponsiveDetailPanel
+          open={expanded}
+          onClose={() => setExpanded(false)}
+          title={play.title}
+          eyebrow={categoryLabel(play.category)}
+        >
+        <div className="px-4 pb-4 border-t border-silver-mid/40 lg:px-6">
           {/* Sensitive plays: CUI caution + disclaimer up top */}
           {play.sensitive && (
             <div className="mt-3 flex items-start gap-2 rounded-inner bg-caution-tint border border-caution/40 px-3 py-2.5">
@@ -228,6 +239,10 @@ export default function PlayCard2({ play }: { play: ContentItem }) {
             </Segment>
           </div>
 
+          <div className="mt-4 flex justify-end border-t border-silver-mid/50 pt-2">
+            <ReportAccessButton targetType="play" targetId={play.id} targetTitle={play.title} targetUrl={`/plays#${play.id}`} />
+          </div>
+
           {/* 4 · See the whole play → assemble verbatim + copy */}
           <button
             onClick={handleAssemble}
@@ -296,6 +311,7 @@ export default function PlayCard2({ play }: { play: ContentItem }) {
             </p>
           )}
         </div>
+        </ResponsiveDetailPanel>
       )}
     </div>
   );

@@ -1,0 +1,12 @@
+.git
+.next
+out
+build
+node_modules
+**/node_modules
+**/dist
+coverage
+*.log
+.env*
+!.env.container.example
+content-source

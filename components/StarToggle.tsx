@@ -27,8 +27,8 @@ export default function StarToggle({
       type="button"
       onClick={handle}
       aria-pressed={starred}
-      aria-label={starred ? `Remove ${item.title} from HQ` : `Add ${item.title} to HQ`}
-      title={starred ? "Starred — on your HQ" : "Star to add to HQ"}
+      aria-label={starred ? `Remove ${item.title} from Home` : `Add ${item.title} to Home`}
+      title={starred ? "Starred — on Home" : "Star to add to Home"}
       className={`flex-shrink-0 flex items-center justify-center rounded-full p-1.5 transition-colors ${
         starred ? "text-warm-dark hover:bg-warm/10" : "text-silver hover:text-warm-dark hover:bg-warm/10"
       } ${className}`}

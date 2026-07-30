@@ -3,10 +3,13 @@
 import Link from "next/link";
 import {
   ArrowRight, Layers, Wrench, GraduationCap,
-  Zap, Repeat, TrendingUp, ShieldCheck, Lightbulb, ExternalLink, BookOpen,
+  Zap, Repeat, TrendingUp, ShieldCheck, Lightbulb, ExternalLink, BookOpen, Search,
 } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
+import { LEARNING_PATHS } from "@/content/learningPaths";
+import { FEATURES } from "@/lib/features";
 import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
+import HomeSections from "@/components/HomeSections";
 
 // ─── Where do you want to start? — the intent doors (route by intent, not device) ─
 const paths = [
@@ -69,11 +72,6 @@ export default function HomePage() {
     <div className="flex flex-col">
       {/* ── Hero: what this is (mission statement) + the User Guide door ── */}
       <div className="relative hero-af text-white px-5 pt-8 pb-10 overflow-hidden rounded-b-[24px]">
-        <div aria-hidden="true" className="pointer-events-none select-none">
-          <div className="hero-blob-1 absolute -top-20 -right-20 w-72 h-72 rounded-full" />
-          <div className="hero-blob-2 absolute top-8 -left-24 w-56 h-56 rounded-full" />
-        </div>
-
         <div className="relative z-10 flex flex-col items-center text-center">
           {/* AF Symbol — authorized white version */}
           <div className="mb-5 mt-1">
@@ -109,6 +107,46 @@ export default function HomePage() {
 
       {/* ── Front-door content — one rhythm for every section ── */}
       <div className="px-4 pt-5 pb-8 flex flex-col gap-7">
+        <section>
+          <ScrollReveal>
+            <form action="/search" className="p-3 rounded-card bg-white border border-silver-mid/40 shadow-resting">
+              <label className="flex items-center gap-2 rounded-inner bg-silver-tint px-3 py-2">
+                <Search size={18} className="text-primary flex-shrink-0" />
+                <span className="sr-only">Search the Playbook</span>
+                <input
+                  name="q"
+                  placeholder="Search tasks, tools, AFSCs, sources..."
+                  className="w-full bg-transparent text-sm font-semibold text-primary-dark placeholder:text-gray-400 outline-none"
+                  autoComplete="off"
+                />
+                <button
+                  type="submit"
+                  className="flex-shrink-0 rounded-badge bg-primary px-3 py-1.5 text-[11px] font-bold text-white"
+                >
+                  Search
+                </button>
+              </label>
+              <div className="mt-2 flex gap-1.5 overflow-x-auto px-1 pb-1">
+                {[
+                  ["2A", "2A"],
+                  ["Awards", "awards"],
+                  ["MFR", "MFR"],
+                  ["Tools", "kind=tool"],
+                  ["Communities", "kind=community"],
+                ].map(([label, value]) => (
+                  <Link
+                    key={label}
+                    href={value.startsWith("kind=") ? `/search?${value}` : `/search?q=${encodeURIComponent(value)}`}
+                    className="flex-shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-badge bg-primary-ghost text-primary"
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            </form>
+          </ScrollReveal>
+        </section>
+
         {/* Where do you want to start? — the intent doors */}
         <section>
           <ScrollReveal>
@@ -146,6 +184,50 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+
+        <HomeSections />
+
+        {FEATURES.learningPaths && (
+          <section>
+            <ScrollReveal>
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <SectionLabel>Learn what fits your work</SectionLabel>
+                <Link href="/communities" className="text-[11px] font-bold text-primary underline underline-offset-2">
+                  See all
+                </Link>
+              </div>
+            </ScrollReveal>
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              {LEARNING_PATHS.map((path) => (
+                <ScrollReveal key={path.id}>
+                  <Link href={path.href} className="flex flex-col h-full p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting active:scale-[0.99] transition-transform">
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-inner bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <GraduationCap size={18} className="text-primary" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-silver">{path.audience}</p>
+                        <h2 className="text-sm font-bold text-primary-dark leading-tight mt-0.5">{path.label}</h2>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-600 leading-snug mt-3">{path.focus}</p>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {path.tags.slice(0, 4).map((tag) => (
+                        <span key={tag} className="text-[10px] font-semibold px-2 py-0.5 rounded-badge bg-primary-ghost text-primary">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-silver-mid/30">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-silver mb-1">First moves</p>
+                      <p className="text-xs text-gray-500 leading-snug">{path.steps.join(", ")}</p>
+                    </div>
+                  </Link>
+                </ScrollReveal>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Three Levels of Engagement — the depth ladder exists before you open a play */}
         <section>

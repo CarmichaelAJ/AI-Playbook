@@ -3,13 +3,19 @@
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import {
   ExternalLink, ChevronDown, ChevronUp, CreditCard, Clock, Check, CheckCircle2,
-  Hourglass, Copy, Layers, ShieldAlert,
+  Hourglass, Copy, Layers, PanelRightOpen, ShieldAlert,
 } from "lucide-react";
 import { TOOLS, SECTIONS, INTENTS, type Tool } from "@/lib/mock/tools";
 import { PLAYS } from "@/content/plays";
 import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
 import { useToolProgress } from "@/lib/toolProgress";
 import StarToggle from "@/components/StarToggle";
+import ResponsiveDetailPanel from "@/components/ResponsiveDetailPanel";
+import ReportAccessButton from "@/components/ReportAccessButton";
+import PlatformFeedTabs from "@/components/PlatformFeedTabs";
+import CommunitySubmissionFeed from "@/components/CommunitySubmissionFeed";
+import { FEATURES } from "@/lib/features";
+import type { PlatformFeedSort } from "@/lib/platformFeed";
 
 // A play card is a lesson; a tool card is a door. Collapsed rows are the shelf,
 // the expanded card is the door: one Open CTA, cleared-for line, checkable path
@@ -301,17 +307,28 @@ function ToolRow({ tool, highlighted }: { tool: Tool; highlighted: boolean }) {
             aria-expanded={expanded}
             className="p-2.5 text-gray-400 hover:text-primary transition-colors"
           >
-            {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            <span className="lg:hidden">
+              {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </span>
+            <PanelRightOpen size={16} className="hidden lg:block" />
           </button>
         </div>
       </div>
 
       {expanded && (
-        <>
+        <ResponsiveDetailPanel
+          open={expanded}
+          onClose={() => setExpanded(false)}
+          title={tool.name}
+          eyebrow="Tool"
+        >
           {/* Expanded header carries the one-liner the row no longer shows */}
-          <p className="px-4 -mt-1 pb-2 text-[11px] text-primary font-semibold">{tool.one_liner}</p>
+          <p className="px-4 pt-4 pb-2 text-[11px] text-primary font-semibold lg:px-6">{tool.one_liner}</p>
           <ExpandedTool tool={tool} />
-        </>
+          <div className="flex justify-end border-t border-silver-mid/50 px-4 py-2 lg:px-6">
+            <ReportAccessButton targetType="tool" targetId={tool.id} targetTitle={tool.name} targetUrl={tool.launch_url} />
+          </div>
+        </ResponsiveDetailPanel>
       )}
     </div>
   );
@@ -335,15 +352,25 @@ function SoonRow({ tool }: { tool: Tool }) {
           </span>
         </span>
         <span className="p-2 text-gray-400">
-          {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          <span className="lg:hidden">
+            {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </span>
+          <PanelRightOpen size={16} className="hidden lg:block" />
         </span>
       </button>
       {expanded && (
-        <div className="px-4 pb-3 border-t border-silver-mid/40">
+        <ResponsiveDetailPanel
+          open={expanded}
+          onClose={() => setExpanded(false)}
+          title={tool.name}
+          eyebrow="Coming soon"
+        >
+        <div className="px-4 pb-3 border-t border-silver-mid/40 lg:px-6">
           <p className="text-[11px] text-gray-500 font-semibold mt-2.5">{tool.one_liner}</p>
           <p className="text-xs text-gray-600 leading-relaxed mt-1.5">{tool.description}</p>
           <p className="text-xs text-gray-700 leading-relaxed mt-2 font-medium">{tool.soon_note}</p>
         </div>
+        </ResponsiveDetailPanel>
       )}
     </div>
   );
@@ -351,6 +378,7 @@ function SoonRow({ tool }: { tool: Tool }) {
 
 export default function ToolsPage() {
   const [activeIntent, setActiveIntent] = useState<string | null>(null);
+  const [feedSort, setFeedSort] = useState<PlatformFeedSort>("core");
 
   const highlightedIds = useMemo(() => {
     if (!activeIntent) return new Set<string>();
@@ -397,6 +425,12 @@ export default function ToolsPage() {
         </p>
       </div>
 
+      {FEATURES.platformDiscoveryFeeds && (
+        <PlatformFeedTabs value={feedSort} onChange={setFeedSort} label="Sort tools" />
+      )}
+
+      {feedSort === "core" || !FEATURES.platformDiscoveryFeeds ? (
+      <>
       {/* Router — "I want to…" intent chips (replaces both filter rows) */}
       <div className="px-4 pt-4">
         <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">I want to…</p>
@@ -467,6 +501,10 @@ export default function ToolsPage() {
           </p>
         </div>
       </div>
+      </>
+      ) : (
+        <CommunitySubmissionFeed kind="tool" sort={feedSort} />
+      )}
     </div>
   );
 }

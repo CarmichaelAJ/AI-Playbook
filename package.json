@@ -4,18 +4,30 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:static": "node scripts/run-next-mode.mjs static dev",
+    "dev:platform": "node scripts/run-next-mode.mjs platform dev",
     "build": "npm run lint:lexicon && next build",
+    "build:static": "npm run lint:lexicon && node scripts/run-next-mode.mjs static build",
+    "build:platform": "npm run lint:lexicon && node scripts/run-next-mode.mjs platform build",
     "start": "next start",
     "lint": "eslint",
     "lint:lexicon": "node scripts/lint-lexicon.mjs",
     "test:verbatim": "node scripts/test-verbatim.mjs",
-    "check:links": "node scripts/check-links.mjs"
+    "check:links": "node scripts/check-links.mjs",
+    "api:build": "npm --prefix services/api run build",
+    "api:dev": "npm --prefix services/api run dev",
+    "container:up": "docker compose up --build",
+    "container:down": "docker compose down"
   },
   "dependencies": {
     "lucide-react": "^1.18.0",
-    "next": "16.2.9",
+    "next": "^16.2.12",
     "react": "19.2.4",
     "react-dom": "19.2.4"
+  },
+  "overrides": {
+    "postcss": "8.5.25",
+    "sharp": "0.35.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

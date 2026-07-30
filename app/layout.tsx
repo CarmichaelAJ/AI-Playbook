@@ -1,18 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Public_Sans, Barlow_Condensed } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 import AppChrome from "@/components/AppChrome";
 
-const publicSans = Public_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+const publicSans = localFont({
+  src: "./fonts/public-sans-latin.woff2",
+  weight: "100 900",
   variable: "--font-public-sans",
 });
 
-const barlowCondensed = Barlow_Condensed({
-  subsets: ["latin"],
-  weight: ["700", "800", "900"],
+const barlowCondensed = localFont({
+  src: [
+    { path: "./fonts/barlow-condensed-700-latin.woff2", weight: "700" },
+    { path: "./fonts/barlow-condensed-800-latin.woff2", weight: "800" },
+    { path: "./fonts/barlow-condensed-900-latin.woff2", weight: "900" },
+  ],
   variable: "--font-barlow-condensed",
 });
 
@@ -37,12 +40,18 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${publicSans.variable} ${barlowCondensed.variable} h-full`}>
       <body className="min-h-full bg-background text-foreground font-[family-name:var(--font-public-sans)]">
-        <div className="max-w-lg md:max-w-3xl lg:max-w-6xl mx-auto min-h-screen relative">
+        <a
+          href="#main-content"
+          className="fixed left-4 top-2 z-[200] -translate-y-[150%] rounded-inner bg-white px-3.5 py-2.5 text-sm font-bold text-primary-dark shadow-modal focus:translate-y-0"
+        >
+          Skip to main content
+        </a>
+        <div className="max-w-lg md:max-w-3xl lg:max-w-6xl mx-auto min-h-screen relative lg:pl-20">
           <div className="bg-warm text-primary-dark text-center text-[10px] font-bold uppercase tracking-widest py-1.5 px-4">
             Concept demonstration. Plays are examples — check every draft before you sign it.
           </div>
           <AppChrome />
-          <main className="page-content">{children}</main>
+          <main id="main-content" tabIndex={-1} className="page-content">{children}</main>
           <BottomNav />
         </div>
       </body>

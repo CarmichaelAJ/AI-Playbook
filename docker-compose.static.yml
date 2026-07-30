@@ -1,0 +1,13 @@
+services:
+  web-static:
+    build:
+      context: .
+      dockerfile: Dockerfile.static
+    ports:
+      - "3003:80"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped

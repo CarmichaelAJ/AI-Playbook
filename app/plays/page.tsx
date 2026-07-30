@@ -1,13 +1,18 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Lightbulb, ExternalLink, TrendingUp } from "lucide-react";
 import { PLAYS } from "@/content/plays";
 import { PLAY_CATEGORIES } from "@/content/categories";
 import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
 import PlayCard2 from "@/components/PlayCard2";
+import PlatformFeedTabs from "@/components/PlatformFeedTabs";
+import CommunitySubmissionFeed from "@/components/CommunitySubmissionFeed";
+import { FEATURES } from "@/lib/features";
+import type { PlatformFeedSort } from "@/lib/platformFeed";
 
 export default function PlaysPage() {
+  const [feedSort, setFeedSort] = useState<PlatformFeedSort>("core");
   const groups = useMemo(
     () =>
       PLAY_CATEGORIES.map((category) => ({
@@ -34,6 +39,12 @@ export default function PlaysPage() {
         </p>
       </div>
 
+      {FEATURES.platformDiscoveryFeeds && (
+        <PlatformFeedTabs value={feedSort} onChange={setFeedSort} label="Sort plays" />
+      )}
+
+      {feedSort === "core" || !FEATURES.platformDiscoveryFeeds ? (
+      <>
       {/* Scope note */}
       <div className="px-4 pt-4">
         <p className="text-xs text-gray-500 font-medium leading-snug">
@@ -103,6 +114,10 @@ export default function PlaysPage() {
           before your name goes on it.
         </p>
       </div>
+      </>
+      ) : (
+        <CommunitySubmissionFeed kind="play" sort={feedSort} />
+      )}
     </div>
   );
 }

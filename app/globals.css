@@ -143,6 +143,11 @@ body {
 .page-content {
   padding-bottom: 5rem;
 }
+@media (min-width: 64rem) {
+  .page-content {
+    padding-bottom: 1.5rem;
+  }
+}
 
 /* Frosted glass nav — silver border gives metallic separation.
    Kept solid + elevated at rest so the tabs read clearly on bright screens. */
@@ -262,8 +267,14 @@ body {
 .animate-check-pop { animation: check-pop 350ms var(--ease-smooth) both; }
 
 /* Global 508-friendly focus ring — keyboard navigation only */
-a:focus-visible, button:focus-visible {
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+@media (forced-colors: active) {
+  .hero-af, .nav-glass {
+    border: 1px solid CanvasText;
+  }
 }
