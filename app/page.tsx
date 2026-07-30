@@ -18,21 +18,18 @@ const paths = [
     icon: Layers,
     title: "Execute a task",
     body: "Get the safe starting move for the situation in front of you. Every play shows its moving parts — fill it in, run it, and check it before your name goes on it.",
-    primary: true,
   },
   {
     href: "/tools",
     icon: Wrench,
     title: "Find tools & data",
     body: "Browse the approved AI, automation, and data tools — from GenAI.mil to SharePoint — with the full access path to get in. If it's listed, it's approved.",
-    primary: false,
   },
   {
     href: "/ai-automation",
     icon: GraduationCap,
     title: "Decide how to attack it",
     body: "Twenty seconds to the right move — chat session, agent, automation, or fix the process first. Then go as deep as you have time for.",
-    primary: false,
   },
 ];
 
@@ -153,32 +150,20 @@ export default function HomePage() {
             <SectionLabel>Where do you want to start?</SectionLabel>
           </ScrollReveal>
           <div className="grid gap-3 md:grid-cols-3">
-            {paths.map(({ href, icon: Icon, title, body, primary }) => (
+            {paths.map(({ href, icon: Icon, title, body }) => (
               <ScrollReveal key={href}>
                 <Link
                   href={href}
-                  className={`flex md:flex-col items-center md:items-start gap-3 h-full p-4 rounded-card shadow-resting active:scale-[0.99] transition-transform ${
-                    primary
-                      ? "bg-primary text-white"
-                      : "bg-white border border-silver-mid/40"
-                  }`}
+                  className="flex md:flex-col items-center md:items-start gap-3 h-full p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting transition-[transform,border-color,box-shadow] hover:border-primary/30 hover:shadow-raised active:scale-[0.99]"
                 >
-                  <div
-                    className={`w-9 h-9 rounded-inner flex items-center justify-center flex-shrink-0 ${
-                      primary ? "bg-white/20" : "bg-primary/10"
-                    }`}
-                  >
-                    <Icon size={18} className={primary ? "text-warm" : "text-primary"} />
+                  <div className="w-9 h-9 rounded-inner flex items-center justify-center flex-shrink-0 bg-primary/10">
+                    <Icon size={18} className="text-primary" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className={`text-sm font-bold leading-tight ${primary ? "text-white" : "text-primary-dark"}`}>
-                      {title}
-                    </p>
-                    <p className={`text-xs leading-snug mt-0.5 ${primary ? "text-on-dark" : "text-gray-500"}`}>
-                      {body}
-                    </p>
+                    <p className="text-sm font-bold leading-tight text-primary-dark">{title}</p>
+                    <p className="text-xs leading-snug mt-0.5 text-gray-500">{body}</p>
                   </div>
-                  <ArrowRight size={16} className={`flex-shrink-0 md:hidden ${primary ? "text-white/70" : "text-silver"}`} />
+                  <ArrowRight size={16} className="flex-shrink-0 md:hidden text-silver" />
                 </Link>
               </ScrollReveal>
             ))}
