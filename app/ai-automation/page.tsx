@@ -517,12 +517,15 @@ export default function AIAutomationPage() {
               </div>
               <div className="min-w-0">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-silver">The schoolhouse</span>
-                <h2 className="text-sm font-bold text-primary-dark">AI for All Airmen (AAA)</h2>
+                {/* Acronym only — the official expansion isn't public, and it's lint-banned (D26, 28 Jul).
+                    Copy tracks the AAA card in lib/mock/tools.ts; keep the two in step. */}
+                <h2 className="text-sm font-bold text-primary-dark">AAA</h2>
                 <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
                   This page got you oriented. When you&apos;re ready for real depth, AAA is the Air Force&apos;s AI schoolhouse
-                  arriving on GenAI.mil: a personal tutor that learns your job and builds a learning roadmap from approved
-                  sources. The Playbook is the no-CAC front door on your phone; AAA is the enterprise schoolhouse. Learn here,
-                  do there. Coming soon, so verify availability locally.
+                  arriving on GenAI.mil, built on Gemini Notebook: a personal tutor that learns your job and builds a
+                  learning roadmap from approved sources. The Playbook is the no-CAC front door on your phone; AAA is the
+                  enterprise schoolhouse. Learn here, do there. &ldquo;AAA&rdquo; is the working name — the official
+                  expansion isn&apos;t public yet. Coming soon, so verify availability locally.
                 </p>
               </div>
             </div>
