@@ -2,7 +2,7 @@
 
 Prepared: 29 July 2026
 
-This is the working field map for turning Airman's Playbook into a standalone app while keeping a static version easy to sell or deploy.
+This is the working field map for turning Airman's AI Playbook into a standalone app while keeping a static version easy to sell or deploy.
 
 ## User Profile
 

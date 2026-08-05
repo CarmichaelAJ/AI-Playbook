@@ -79,7 +79,7 @@ export default function HomePage() {
           <div className="w-12 h-px bg-warm mb-5" aria-hidden="true" />
 
           <h1 className="font-display text-4xl font-black uppercase tracking-wider leading-tight mb-2">
-            Airman&apos;s<br />Playbook
+            Airman&apos;s<br />AI Playbook
           </h1>
 
           {/* FLAGGED: "Built for Airmen, by Airmen" tagline pending product-owner adjudication (Doctrine appendix) */}
@@ -109,7 +109,7 @@ export default function HomePage() {
             <form action="/search" className="p-3 rounded-card bg-white border border-silver-mid/40 shadow-resting">
               <label className="flex items-center gap-2 rounded-inner bg-silver-tint px-3 py-2">
                 <Search size={18} className="text-primary flex-shrink-0" />
-                <span className="sr-only">Search the Playbook</span>
+                <span className="sr-only">Search the AI Playbook</span>
                 <input
                   name="q"
                   placeholder="Search tasks, tools, AFSCs, sources..."
@@ -273,7 +273,7 @@ export default function HomePage() {
         {/* FLAGGED: suggest-a-play mechanism endorsed in spirit; placement + wording unratified (Doctrine appendix). */}
         <section>
           <ScrollReveal>
-            <SectionLabel>Help build the Playbook</SectionLabel>
+            <SectionLabel>Help build the AI Playbook</SectionLabel>
           </ScrollReveal>
           <ScrollReveal>
             {SUGGEST_PLAY_FORM_URL ? (

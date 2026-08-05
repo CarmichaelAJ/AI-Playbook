@@ -4,7 +4,7 @@ Prepared: 29 July 2026
 
 ## North Star
 
-Airman's Playbook should run as either a static content app or a full platform app without rewriting the product. Every feature gets a clear switch, a static fallback, and a platform path.
+Airman's AI Playbook should run as either a static content app or a full platform app without rewriting the product. Every feature gets a clear switch, a static fallback, and a platform path.
 
 ## Containers
 

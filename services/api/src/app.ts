@@ -428,7 +428,7 @@ export async function createApiApp(config: ApiConfig = readConfig()): Promise<{ 
     await operations.notify(
       input.recipientEmail,
       "message",
-      "New Playbook message",
+      "New AI Playbook message",
       `You received a message from ${session.email}.`,
       `/messages?with=${encodeURIComponent(session.email)}`,
     );

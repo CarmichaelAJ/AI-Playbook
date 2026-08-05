@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Clock3, Flame, Library, Plus, TrendingUp } from "lucide-react";
+import { APP_MODE } from "@/lib/features";
 import type { PlatformFeedSort } from "@/lib/platformFeed";
 
 const OPTIONS = [
@@ -20,6 +21,8 @@ export default function PlatformFeedTabs({
   onChange: (value: PlatformFeedSort) => void;
   label: string;
 }) {
+  if (APP_MODE === "static") return null;
+
   return (
     <div className="relative z-10 -mt-2 px-4 pt-3">
       <div className="mx-auto flex h-12 max-w-2xl items-stretch gap-1 rounded-inner border border-silver-mid/60 bg-white p-1 shadow-resting">

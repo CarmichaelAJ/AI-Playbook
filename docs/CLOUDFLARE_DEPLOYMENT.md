@@ -5,7 +5,7 @@ The production-shaped stack exposes only the Nginx web service through a remotel
 ## One-time setup
 
 1. Create a remotely managed tunnel in Cloudflare Zero Trust.
-2. Add a public hostname for the Playbook domain.
+2. Add a public hostname for the AI Playbook domain.
 3. Set the tunnel service target to `http://web:80`.
 4. Copy `.env.cloudflare.example` to a local `.env.cloudflare` file.
 5. Put the tunnel token in `CLOUDFLARE_TUNNEL_TOKEN`.

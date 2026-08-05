@@ -5,6 +5,7 @@ import {
   Layers, Wrench, GraduationCap, X, Lightbulb, ExternalLink, Link2, ShieldCheck, PenLine, Building2,
 } from "lucide-react";
 import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
+import { PRODUCT_NAME } from "@/lib/branding";
 
 // The three intent doors — the app routes by intent (Doctrine §4).
 const doors = [
@@ -65,7 +66,7 @@ export default function GuideModal({ open, onClose }: { open: boolean; onClose: 
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/assets/af-symbol-white.svg" alt="U.S. Air Force" className="h-6 flex-shrink-0" draggable={false} />
                 <div className="w-px h-5 bg-silver/40 flex-shrink-0" aria-hidden="true" />
-                <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s Playbook</span>
+                <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">{PRODUCT_NAME}</span>
               </div>
               <h2 className="font-display text-2xl font-bold uppercase tracking-wider">User Guide</h2>
               <p className="text-sm text-on-dark mt-0.5">What the Playbook is, what it isn&apos;t, and where it points you.</p>

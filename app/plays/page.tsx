@@ -9,6 +9,7 @@ import PlayCard2 from "@/components/PlayCard2";
 import PlatformFeedTabs from "@/components/PlatformFeedTabs";
 import CommunitySubmissionFeed from "@/components/CommunitySubmissionFeed";
 import { FEATURES } from "@/lib/features";
+import { PRODUCT_NAME } from "@/lib/branding";
 import type { PlatformFeedSort } from "@/lib/platformFeed";
 
 export default function PlaysPage() {
@@ -30,7 +31,7 @@ export default function PlaysPage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/assets/af-symbol-white.svg" alt="U.S. Air Force" className="h-6 flex-shrink-0" draggable={false} />
           <div className="w-px h-5 bg-silver/40 flex-shrink-0" aria-hidden="true" />
-          <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s Playbook</span>
+          <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">{PRODUCT_NAME}</span>
         </div>
         <h1 className="font-display text-2xl font-bold uppercase tracking-wider mb-1">Plays</h1>
         <p className="text-sm text-on-dark">

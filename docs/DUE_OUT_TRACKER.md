@@ -11,7 +11,7 @@ in the project handoff folder.
 | Meeting due out | Status | Remaining action |
 | --- | --- | --- |
 | Detailed tech stack | Complete | Use `docs/TECH_STACK.md` as the proposal annex baseline |
-| One-page CDAO proposal | PowerPoint draft complete | Validate sponsor, exact ask, hosting preference, cost range, and release target in `CDAO Airman's Playbook One-Page Proposal DRAFT.pptx` in the private handoff folder |
+| One-page CDAO proposal | PowerPoint draft complete | Validate sponsor, exact ask, hosting preference, cost range, and release target in `CDAO Airman's AI Playbook One-Page Proposal DRAFT.pptx` in the private handoff folder |
 | Supporting proposal annexes | Package register complete | Use `Sonny CDAO Package - Deliverables Register.md` in the private handoff folder to finish cost, hosting, sustainment, collaboration, beta, and risk annexes |
 | Platform One quote | External | Rosa obtains formal estimate and included services |
 | AFTC IL2 MAG inquiry | External | Rosa coordinates through the responsible Government PM or COR and obtains the authorization, service, onboarding, and cost response |

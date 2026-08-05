@@ -14,6 +14,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { FEATURES } from "@/lib/features";
+import { PRODUCT_NAME } from "@/lib/branding";
 import { usePlatformIdentity } from "@/lib/platformIdentity";
 
 const tabs = [
@@ -107,8 +108,7 @@ export default function BottomNav() {
         <div className={`flex items-center gap-3 px-4 py-4 ${collapsed ? "justify-center" : "justify-between"}`}>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s</p>
-              <p className="text-sm font-extrabold text-white leading-none">Playbook</p>
+              <p className="text-sm font-extrabold leading-tight text-white">{PRODUCT_NAME}</p>
             </div>
           )}
           <button

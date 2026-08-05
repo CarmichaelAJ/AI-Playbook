@@ -1,4 +1,4 @@
-# Airman's Playbook — Outline (living TOC)
+# Airman's AI Playbook — Outline (living TOC)
 
 > **Placeholder.** Real structure derives from the Strategy doc (Attachment 2) and the
 > Playbook Lead's direction once obtained. Do not draft sections until lane + format are

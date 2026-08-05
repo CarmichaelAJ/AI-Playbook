@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { PRODUCT_NAME, PRODUCT_SHORT_NAME } from "@/lib/branding";
 
 // Web app manifest served at /manifest.webmanifest via Next's metadata-route
 // convention. (A static public/manifest.json does not work — the App Router
@@ -7,8 +8,8 @@ import type { MetadataRoute } from "next";
 // metadata.manifest manually.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Airman's Playbook",
-    short_name: "Playbook",
+    name: PRODUCT_NAME,
+    short_name: PRODUCT_SHORT_NAME,
     description: "Pick your situation, get the safe starting move, and go run it.",
     start_url: "/",
     display: "standalone",

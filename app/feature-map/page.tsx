@@ -1,6 +1,7 @@
 import { CheckCircle2, Database, LockKeyhole, Power, PowerOff, ShieldCheck, SlidersHorizontal } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import { APP_MODE, FEATURES, FEATURE_REGISTRY, type FeatureMode } from "@/lib/features";
+import { PRODUCT_NAME } from "@/lib/branding";
 
 const MODE_COPY: Record<FeatureMode, { label: string; description: string }> = {
   static: {
@@ -36,7 +37,11 @@ const buildGroups = [
 ];
 
 export default function FeatureMapPage() {
-  const entries = Object.entries(FEATURE_REGISTRY);
+  const modes = (Object.entries(MODE_COPY) as Array<[FeatureMode, (typeof MODE_COPY)[FeatureMode]]>).filter(
+    ([mode]) => APP_MODE === "platform" || mode !== "platform",
+  );
+  const visibleBuildGroups = APP_MODE === "platform" ? buildGroups : buildGroups.filter((group) => group.title === "Static sellable build");
+  const entries = Object.entries(FEATURE_REGISTRY).filter(([, feature]) => APP_MODE === "platform" || feature.mode !== "platform");
 
   return (
     <div className="flex flex-col">
@@ -45,7 +50,7 @@ export default function FeatureMapPage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/assets/af-symbol-white.svg" alt="U.S. Air Force" className="h-6 flex-shrink-0" draggable={false} />
           <div className="w-px h-5 bg-silver/40 flex-shrink-0" aria-hidden="true" />
-          <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s Playbook</span>
+          <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">{PRODUCT_NAME}</span>
         </div>
         <h1 className="font-display text-2xl font-bold uppercase tracking-wider mb-1">Feature Map</h1>
         <p className="text-sm text-on-dark">
@@ -62,9 +67,13 @@ export default function FeatureMapPage() {
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-silver">Product rule</p>
-                <h2 className="text-sm font-bold text-primary-dark mt-0.5">Every platform feature gets a static fallback</h2>
+                <h2 className="text-sm font-bold text-primary-dark mt-0.5">
+                  {APP_MODE === "static" ? "A focused, static content edition" : "Every platform feature gets a static fallback"}
+                </h2>
                 <p className="text-xs text-gray-600 leading-snug mt-1">
-                  Data environment labels are treated as hosting and handling constraints, not personal clearance claims. Classified workflows stay unsupported until the hosting and authority path says otherwise.
+                  {APP_MODE === "static"
+                    ? "No account, server storage, or user collection. Content and local preferences stay on this device."
+                    : "Data environment labels are treated as hosting and handling constraints, not personal clearance claims. Classified workflows stay unsupported until the hosting and authority path says otherwise."}
                 </p>
               </div>
             </div>
@@ -72,7 +81,7 @@ export default function FeatureMapPage() {
         </ScrollReveal>
 
         <div className="grid gap-3 lg:grid-cols-3">
-          {(Object.entries(MODE_COPY) as Array<[FeatureMode, (typeof MODE_COPY)[FeatureMode]]>).map(([mode, copy]) => (
+          {modes.map(([mode, copy]) => (
             <ScrollReveal key={mode}>
               <section className="p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting h-full">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-silver">{mode}</p>
@@ -84,7 +93,7 @@ export default function FeatureMapPage() {
         </div>
 
         <div className="grid gap-3 xl:grid-cols-3">
-          {buildGroups.map((group) => (
+          {visibleBuildGroups.map((group) => (
             <ScrollReveal key={group.title}>
               <section className="p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting h-full">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-silver">Build option</p>

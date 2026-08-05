@@ -7,6 +7,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { SOURCE_COMMUNITIES } from "@/content/communities";
 import { PLAYS } from "@/content/plays";
 import { FEATURES } from "@/lib/features";
+import { PRODUCT_NAME } from "@/lib/branding";
 import { TOOLS } from "@/lib/mock/tools";
 import PlatformFeedTabs from "@/components/PlatformFeedTabs";
 import CommunitySubmissionFeed from "@/components/CommunitySubmissionFeed";
@@ -35,7 +36,7 @@ export default function CommunitiesPage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/assets/af-symbol-white.svg" alt="U.S. Air Force" className="h-6 flex-shrink-0" draggable={false} />
           <div className="w-px h-5 bg-silver/40 flex-shrink-0" aria-hidden="true" />
-          <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s Playbook</span>
+          <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">{PRODUCT_NAME}</span>
         </div>
         <h1 className="font-display text-2xl font-bold uppercase tracking-wider mb-1">Communities</h1>
         <p className="text-sm text-on-dark">

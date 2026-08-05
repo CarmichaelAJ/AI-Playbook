@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, BookOpen, Filter, GraduationCap, Layers, Search, Users, Wrench } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import { FEATURES } from "@/lib/features";
+import { PRODUCT_NAME } from "@/lib/branding";
 import { searchCommunityContent, trackAnalyticsEvent, type CommunitySubmission } from "@/lib/platformApi";
 import { SEARCH_KINDS, SOURCE_COMMUNITIES, searchItems, type SearchKind, type SearchItem } from "@/lib/search";
 
@@ -138,7 +139,7 @@ export default function SearchPage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/assets/af-symbol-white.svg" alt="U.S. Air Force" className="h-6 flex-shrink-0" draggable={false} />
           <div className="w-px h-5 bg-silver/40 flex-shrink-0" aria-hidden="true" />
-          <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s Playbook</span>
+          <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">{PRODUCT_NAME}</span>
         </div>
         <h1 className="font-display text-2xl font-bold uppercase tracking-wider mb-1">Search</h1>
         <p className="text-sm text-on-dark">
@@ -151,7 +152,7 @@ export default function SearchPage() {
           <div className="p-3 rounded-card bg-white border border-silver-mid/40 shadow-resting">
             <label className="flex items-center gap-2 rounded-inner bg-silver-tint px-3 py-2">
               <Search size={18} className="text-primary flex-shrink-0" />
-              <span className="sr-only">Search the Playbook</span>
+              <span className="sr-only">Search the AI Playbook</span>
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}

@@ -9,6 +9,7 @@ import {
   type OnboardingIntent,
   useOnboarding,
 } from "@/lib/onboarding";
+import { PRODUCT_NAME } from "@/lib/branding";
 
 const intentOptions: Array<{ id: OnboardingIntent; icon: typeof Layers }> = [
   { id: "execute", icon: Layers },
@@ -67,7 +68,7 @@ export default function OnboardingModal({ open, onClose }: { open: boolean; onCl
         <div className="sticky top-0 z-10 hero-af text-white px-5 pt-5 pb-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s Playbook</span>
+              <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">{PRODUCT_NAME}</span>
               <h2 className="font-display text-2xl font-bold uppercase tracking-wider mt-2">Set up Home</h2>
               <p className="text-sm text-on-dark mt-0.5">Two taps. Saved only on this device.</p>
             </div>

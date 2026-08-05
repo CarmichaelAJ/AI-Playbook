@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { LogOut, ShieldCheck, UserRound, X } from "lucide-react";
+import { APP_MODE } from "@/lib/features";
 import { syncPlatformProfile } from "@/lib/platformApi";
 import {
   clearPlatformIdentity,
@@ -75,6 +76,8 @@ export default function PlatformAccount() {
       setError(signInError instanceof Error ? signInError.message : "Could not register this identity.");
     }
   };
+
+  if (APP_MODE === "static") return null;
 
   return (
     <>

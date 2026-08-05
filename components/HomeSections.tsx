@@ -212,7 +212,7 @@ function StrategyStack() {
         <div className="flex gap-3">
           <div className="w-3.5 h-3.5 rounded-full bg-success mt-1 flex-shrink-0 ring-4 ring-success-tint" />
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold text-success-mid leading-tight">YOU — this Playbook in your pocket</p>
+            <p className="text-xs font-bold text-success-mid leading-tight">YOU — this AI Playbook in your pocket</p>
             <p className="text-[10px] text-silver mt-0.5">Built by Airmen · CSAF-endorsed · no CAC, no account</p>
             <p className="text-[11px] text-gray-500 leading-snug mt-1">
               Everything above lands here: the safe starting move for the task in front of you, today.

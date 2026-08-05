@@ -1,4 +1,4 @@
-const CACHE_NAME = "airmans-playbook-static-v1";
+const CACHE_NAME = "airmans-ai-playbook-static-v1";
 const CORE = ["/", "/plays", "/tools", "/communities", "/ai-automation", "/learn", "/search", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {

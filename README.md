@@ -1,6 +1,6 @@
-# Airman's Playbook
+# Airman's AI Playbook
 
-Public home for the **Airman's Playbook** and its associated team-facing deliverables. The app helps Airmen get acquainted with approved AI tools, learning paths, source communities, and practical plays.
+Public home for the **Airman's AI Playbook** and its associated team-facing deliverables. The app helps Airmen get acquainted with approved AI tools, learning paths, source communities, and practical plays.
 
 This repository publishes finished product. Private working notes, meeting transcripts, and source context stay outside the public repo unless cleared for release.
 
@@ -59,7 +59,7 @@ Platform routes:
 - `/messages` - direct `.mil` platform messaging
 - `/admin` - feature, media, safety, user, analytics, and audit controls
 - `Top`, `Trending`, and `Recent` - approved community content only
-- `Core` - built-in Playbook catalog only
+- `Core` - built-in AI Playbook catalog only
 
 Community API routes live under `/v1/submissions`, `/v1/feed`, and `/v1/moderation`. Votes are unique per authenticated email, comments carry username/AFSC/rank attribution, and pending content never appears in public feeds.
 
