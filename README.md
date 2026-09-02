@@ -29,6 +29,11 @@ npm run build:static
 npm run build:platform
 ```
 
+For Vercel, `vercel.json` selects the static build and serves the generated
+`out/` directory. Import `CarmichaelAJ/AI-Playbook` and select the branch to
+publish. The static build excludes platform account, submission, moderation,
+and messaging routes and does not require the API or database.
+
 Run the standalone static container at http://localhost:3003:
 
 ```bash
