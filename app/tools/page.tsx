@@ -17,6 +17,7 @@ import CommunitySubmissionFeed from "@/components/CommunitySubmissionFeed";
 import { FEATURES } from "@/lib/features";
 import type { PlatformFeedSort } from "@/lib/platformFeed";
 import PageHero from "@/components/PageHero";
+import { playHref } from "@/lib/communityGraph";
 import styles from "./tools.module.css";
 
 const PLAY_TITLES: Record<string, string> = Object.fromEntries(
@@ -154,7 +155,7 @@ function RunsThesePlays({ tool }: { tool: Tool }) {
       {tool.play_ids.length > 0 ? (
         <div className={styles.playLinks}>
           {tool.play_ids.map((pid) => (
-            <a key={pid} href={`/plays#${pid}`}>
+            <a key={pid} href={playHref(pid)}>
               <Layers size={14} aria-hidden="true" /> {PLAY_TITLES[pid] ?? pid}
             </a>
           ))}

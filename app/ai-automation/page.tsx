@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHero from "@/components/PageHero";
+import { playHref } from "@/lib/communityGraph";
 
 // ─── Progressive-disclosure accordion — depth never reads heavy ─────────────────
 function Accordion({
@@ -389,7 +390,7 @@ export default function AIAutomationPage() {
                         </a>
                       )}
                       {n === 3 && (
-                        <Link href="/plays" className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary mt-1.5">
+                        <Link href={playHref("process-map-constraint")} className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary mt-1.5">
                           Run the Improve the Process plays <ArrowUpRight size={11} />
                         </Link>
                       )}

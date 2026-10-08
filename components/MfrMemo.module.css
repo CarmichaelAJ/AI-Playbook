@@ -1,0 +1,184 @@
+/*
+ * Separate-page MFR, AFH 33-337 Chapter 14 (pp. 190-191).
+ *
+ * The "page" is a US Letter sheet (8.5in wide). On wide containers every measurement is
+ * expressed in container-width units, so the sheet scales exactly like the handbook
+ * figure: 12 pt type = 1.96cqw, 1in margins = 11.76cqw, date at 1.75in from the top, and
+ * the signature at 4.5in from the left edge. Narrow containers drop the fixed proportions
+ * and use a fluid, readable layout with the same element order.
+ */
+.section {
+  background: #dfe3e8;
+  color: #0b1f3a;
+  padding: 48px 16px 56px;
+}
+
+.frame {
+  max-width: 8.5in;
+  margin-inline: auto;
+  container-type: inline-size;
+}
+
+.page {
+  background: #fff;
+  color: #000;
+  font-family: "Times New Roman", Times, "Liberation Serif", serif;
+  font-size: 16px;
+  line-height: 1.35;
+  padding: 24px 20px 32px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .18), 0 18px 40px -18px rgb(5 18 29 / .45);
+}
+
+.page p {
+  margin: 0;
+}
+
+.letterhead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  font-family: Arial, "Liberation Sans", Helvetica, sans-serif;
+}
+
+.seal {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.letterheadText {
+  flex: 1;
+  text-align: center;
+}
+
+.agency {
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.unit {
+  font-weight: 700;
+  font-size: .85em;
+}
+
+.date {
+  margin-top: 24px !important;
+  text-align: right;
+}
+
+.title {
+  margin: 20px 0 0;
+  font: inherit;
+  font-weight: 400;
+}
+
+.line {
+  margin-top: 14px !important;
+}
+
+.body {
+  margin-top: 14px;
+}
+
+.paragraph {
+  margin-top: 14px !important;
+  text-align: left;
+  overflow-wrap: break-word;
+}
+
+.paragraph[data-level="1"] { text-indent: .25in; }
+.paragraph[data-level="2"] { text-indent: .5in; }
+
+.signoff {
+  margin-top: 32px;
+  padding-left: 25%;
+  break-inside: avoid;
+}
+
+.ink {
+  width: min(100%, 2.6in);
+  margin-bottom: 4px;
+}
+
+.block p {
+  text-transform: none;
+}
+
+@container (min-width: 760px) {
+  .page {
+    aspect-ratio: 8.5 / 11;
+    font-size: 1.96cqw;
+    padding: 5.9cqw 11.76cqw 11.76cqw;
+  }
+  .letterhead { min-height: 14.7cqw; gap: 2.5cqw; }
+  .seal { width: 12.4cqw; height: 12.4cqw; }
+  .date { margin-top: 0 !important; }
+  .title, .line, .paragraph, .body { margin-top: 0; }
+  .title { margin-top: 1.96cqw; }
+  .line { margin-top: 1.96cqw !important; }
+  .body { margin-top: 0; }
+  .paragraph { margin-top: 1.96cqw !important; }
+  .signoff { margin-top: 7.84cqw; padding-left: 0; margin-left: 41.2cqw; }
+  .ink { width: 28cqw; margin-bottom: 0; }
+}
+
+.meta {
+  max-width: 8.5in;
+  margin: 28px auto 0;
+  color: #1c2b3d;
+}
+
+.endorsement {
+  font-family: var(--font-editorial, Georgia, serif);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.provenance {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #3d4b5c;
+}
+
+.provenance summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.hash {
+  overflow-wrap: anywhere;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 24px;
+}
+
+.links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: #0b1f3a;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (min-width: 48rem) {
+  .section { padding: 72px 48px 80px; }
+}
+
+@media print {
+  .section { background: #fff; padding: 0; }
+  .page { box-shadow: none; }
+}

@@ -3,7 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import PageHero from "@/components/PageHero";
 import { Photo } from "@/components/Photograph";
 import { PHOTOGRAPHS } from "@/content/photography";
-import { CSAF_LETTER } from "@/content/leadership";
+import { APPROVED_MEMO } from "@/content/memo";
 import styles from "./credits.module.css";
 
 export const metadata: Metadata = {
@@ -47,20 +47,19 @@ export default function CreditsPage() {
         </ul>
       </section>
 
-      <section className={styles.section} aria-labelledby="signature-heading">
-        <h2 id="signature-heading" className={styles.heading}>Signature and message</h2>
-        <p className={styles.note}>
-          The signature and quotation come from {CSAF_LETTER.author}&apos;s published {CSAF_LETTER.title},
-          dated {CSAF_LETTER.dateLabel}. They are reproduced from the original scan and are not retraced. They represent
-          published leadership intent and are not an endorsement of this Playbook.
-        </p>
-        <div className={styles.links}>
-          <a href={CSAF_LETTER.officialUrl} target="_blank" rel="noopener noreferrer" className={styles.link}>Official letter <ArrowUpRight size={14} aria-hidden="true" /></a>
-          <a href={CSAF_LETTER.archivedUrl} target="_blank" rel="noopener noreferrer" className={styles.link}>Archived copy <ArrowUpRight size={14} aria-hidden="true" /></a>
-          <a href={CSAF_LETTER.localUrl} target="_blank" rel="noopener noreferrer" className={styles.link}>Local PDF <ArrowUpRight size={14} aria-hidden="true" /></a>
-        </div>
-        <p className={styles.note}>The strategy foreword quoted on the home page is separately attributed to Secretary of the Air Force Troy E. Meink.</p>
-      </section>
+      {APPROVED_MEMO && (
+        <section className={styles.section} aria-labelledby="signature-heading">
+          <h2 id="signature-heading" className={styles.heading}>Memorandum and signature</h2>
+          <p className={styles.note}>
+            {APPROVED_MEMO.provenance.title}. {APPROVED_MEMO.provenance.approvedBy}. The signature was converted to SVG from
+            {" "}{APPROVED_MEMO.signature.source.description} (SHA-256 {APPROVED_MEMO.signature.source.sha256}).
+          </p>
+          <div className={styles.links}>
+            {APPROVED_MEMO.provenance.sourceUrl && <a href={APPROVED_MEMO.provenance.sourceUrl} target="_blank" rel="noopener noreferrer" className={styles.link}>Official source <ArrowUpRight size={14} aria-hidden="true" /></a>}
+            {APPROVED_MEMO.provenance.localUrl && <a href={APPROVED_MEMO.provenance.localUrl} target="_blank" rel="noopener noreferrer" className={styles.link}>Signed copy (PDF) <ArrowUpRight size={14} aria-hidden="true" /></a>}
+          </div>
+        </section>
+      )}
 
       <section className={styles.section} aria-labelledby="type-heading">
         <h2 id="type-heading" className={styles.heading}>Typefaces</h2>

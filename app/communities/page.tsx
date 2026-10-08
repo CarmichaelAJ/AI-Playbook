@@ -2,19 +2,15 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Layers, Search, Users, Wrench } from "lucide-react";
+import { ArrowRight, Search, Users } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
-import { SOURCE_COMMUNITIES } from "@/content/communities";
-import { PLAYS } from "@/content/plays";
+import { COMMUNITY_LEVEL_LABEL } from "@/content/communities";
 import { FEATURES } from "@/lib/features";
 import PageHero from "@/components/PageHero";
-import { TOOLS } from "@/lib/mock/tools";
 import PlatformFeedTabs from "@/components/PlatformFeedTabs";
 import CommunitySubmissionFeed from "@/components/CommunitySubmissionFeed";
+import { childrenOf, playIdsIn, topLevelCommunities } from "@/lib/communityGraph";
 import type { PlatformFeedSort } from "@/lib/platformFeed";
-
-const playTitle = new Map(PLAYS.map((p) => [p.id, p.title]));
-const toolTitle = new Map(TOOLS.map((t) => [t.id, t.name]));
 
 export default function CommunitiesPage() {
   const [feedSort, setFeedSort] = useState<PlatformFeedSort>("core");
@@ -33,7 +29,8 @@ export default function CommunitiesPage() {
     <div className="editorial-page bleed flex flex-col">
       <PageHero eyebrow="Airman adoption" title="Communities" photo="hangar-t6" position="50% 70%">
         <p>
-          Source communities for feedback, AFSC language, and practical use cases. These are starting points pending SME validation.
+          Start with a broad community, then narrow to a career field, AFSC, special duty, or role. Plays live inside
+          communities. These are working groups pending SME validation, not an authoritative AFSC mapping.
         </p>
       </PageHero>
 
@@ -51,7 +48,7 @@ export default function CommunitiesPage() {
               <span className="sr-only">Search source communities</span>
               <input
                 name="q"
-                placeholder="Search AFSCs, roles, work types..."
+                placeholder="Search communities, AFSCs, roles, tasks..."
                 className="w-full bg-transparent text-sm font-semibold text-primary-dark placeholder:text-gray-400 outline-none"
                 autoComplete="off"
               />
@@ -59,65 +56,65 @@ export default function CommunitiesPage() {
                 Search
               </button>
             </label>
-            <p className="text-[10px] text-gray-400 leading-snug mt-2 px-1">Try: 2A, 1D7, medical, maintenance, instructor, commander</p>
+            <p className="text-[10px] text-gray-500 leading-snug mt-2 px-1">Try: 2A6X1, UDM, UTM, EPB, 1D7, medical, instructor, commander</p>
           </form>
         </ScrollReveal>
 
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {SOURCE_COMMUNITIES.map((community) => (
-            <ScrollReveal key={community.id}>
-              <section id={community.id} className="p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting scroll-mt-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-inner bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Users size={17} className="text-primary" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-silver">{community.kind}</p>
-                    <h2 className="text-sm font-bold text-primary-dark leading-tight mt-0.5">{community.name}</h2>
-                    <p className="text-xs text-gray-600 leading-snug mt-1">{community.mission}</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-1.5 flex-wrap mt-3">
-                  {community.aliases.slice(0, 7).map((alias) => (
-                    <span key={alias} className="text-[10px] font-semibold px-2 py-0.5 rounded-badge bg-primary-ghost text-primary">
-                      {alias}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="mt-3">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-silver mb-1.5">Common work</p>
-                  <p className="text-xs text-gray-600 leading-snug">{community.commonWork.join(", ")}</p>
-                </div>
-
-                <div className="mt-3 grid gap-2">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-silver mb-1.5">Starter plays</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {community.startingPlayIds.map((id) => (
-                        <Link key={id} href={`/plays#${id}`} className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-badge bg-primary-ghost text-primary border border-primary/20">
-                          <Layers size={10} /> {playTitle.get(id) ?? id}
-                        </Link>
-                      ))}
+          {topLevelCommunities().map((community) => {
+            const narrower = childrenOf(community.id);
+            return (
+              <ScrollReveal key={community.id}>
+                <section id={community.id} className="p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting scroll-mt-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-inner bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Users size={17} className="text-primary" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-silver">{COMMUNITY_LEVEL_LABEL[community.level]}</p>
+                      <h2 className="text-sm font-bold text-primary-dark leading-tight mt-0.5">
+                        <Link href={`/communities/${community.id}`} className="hover:underline">{community.name}</Link>
+                      </h2>
+                      <p className="text-xs text-gray-600 leading-snug mt-1">{community.mission}</p>
                     </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-silver mb-1.5">Starter tools</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {community.startingToolIds.map((id) => (
-                        <Link key={id} href="/tools" className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-badge bg-silver-tint text-primary-dark border border-silver-mid/40">
-                          <Wrench size={10} /> {toolTitle.get(id) ?? id}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                </div>
 
-                <p className="mt-3 text-[11px] text-gray-500 leading-snug">{community.notes}</p>
-              </section>
-            </ScrollReveal>
-          ))}
+                  <div className="flex gap-1.5 flex-wrap mt-3">
+                    {community.aliases.slice(0, 7).map((alias) => (
+                      <span key={alias} className="text-[10px] font-semibold px-2 py-0.5 rounded-badge bg-primary-ghost text-primary">
+                        {alias}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="mt-3">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-silver mb-1.5">Common work</p>
+                    <p className="text-xs text-gray-600 leading-snug">{community.commonWork.join(", ")}</p>
+                  </div>
+
+                  {narrower.length > 0 && (
+                    <div className="mt-3">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-silver mb-1.5">Narrower</p>
+                      <ul className="flex flex-wrap gap-1.5">
+                        {narrower.map((child) => (
+                          <li key={child.id}>
+                            <Link href={`/communities/${child.id}`} className="inline-flex min-h-8 items-center rounded-badge border border-primary/25 px-2.5 text-[11px] font-semibold text-primary hover:bg-primary-ghost">
+                              {child.name}
+                              <span className="ml-1 text-[9px] font-bold uppercase tracking-wide text-silver">{COMMUNITY_LEVEL_LABEL[child.level]}</span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <Link href={`/communities/${community.id}`} className="mt-4 inline-flex min-h-11 items-center gap-1.5 text-xs font-bold text-primary">
+                    Open community · {playIdsIn(community.id).length} {playIdsIn(community.id).length === 1 ? "play" : "plays"} <ArrowRight size={14} aria-hidden="true" />
+                  </Link>
+                </section>
+              </ScrollReveal>
+            );
+          })}
         </div>
       </div>
       ) : (

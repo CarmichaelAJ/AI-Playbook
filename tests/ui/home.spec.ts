@@ -1,64 +1,77 @@
-import { createHash } from "node:crypto";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { CSAF_LETTER } from "../../content/leadership";
+import { APPROVED_MEMO } from "../../content/memo";
 import { ALL_LIBRARY, SHELF_FILTERS, STRATEGY_STACK } from "../../content/library";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/", { waitUntil: "networkidle" });
 });
 
-test("published leadership intent retains its provenance without claiming endorsement", async ({ page, request }) => {
+test("hero shows the H1 and four working routes that leave the page", async ({ page }) => {
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await expect(page.locator("#playbook-title")).toHaveText("Airman's AI Playbook");
-  await expect(page.locator("#leadership-source blockquote")).toHaveText(`“${CSAF_LETTER.quote}”`);
-  await expect(page.locator("#leadership-source")).toContainText("Not an endorsement of this Playbook.");
-  await expect(page.locator("#leadership-source time")).toHaveAttribute("datetime", "2025-11-03");
-  await expect(page.locator("main img[src*='af-symbol']")).toHaveCount(0);
-  const signature = page.locator("[data-leadership-signature]");
-  await expect(signature).toHaveAttribute("src", CSAF_LETTER.signatureUrl);
-  expect(await signature.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth === 596 && image.naturalHeight === 138)).toBe(true);
-  await page.getByText("About the signature & its source", { exact: true }).click();
-  await expect(page.getByRole("link", { name: "Official letter", exact: true })).toHaveAttribute("href", CSAF_LETTER.officialUrl);
-  await expect(page.getByRole("link", { name: "Archived official copy" })).toHaveAttribute("href", CSAF_LETTER.archivedUrl);
-  await expect(page.getByRole("link", { name: "Read the complete letter (PDF)" })).toHaveAttribute("href", CSAF_LETTER.localUrl);
-  const pdf = await request.get(CSAF_LETTER.localUrl);
-  expect(pdf.status()).toBe(200);
-  expect(createHash("sha256").update(await pdf.body()).digest("hex")).toBe(CSAF_LETTER.sourceSha256);
-  const strategy = page.locator("section", { has: page.locator("#direction-title") });
-  await expect(strategy).toContainText("Troy E. Meink");
-  await expect(strategy).toContainText("Secretary of the Air Force");
-  await expect(strategy.getByRole("link", { name: "Read the strategy" })).toHaveAttribute("href", "/reader/daf-ai-strategy");
+  await expect(page.locator("h1")).toHaveText("Airman's AI Playbook");
+  const hero = page.locator("section[aria-labelledby='playbook-title']");
+  const box = await hero.boundingBox();
+  expect(box!.height).toBeGreaterThanOrEqual(900 - 100);
+  const routes = [["Communities", "/communities"], ["Search", "/search"], ["Tools", "/tools"], ["Sign in", "/sign-in"]];
+  const actions = hero.getByRole("navigation", { name: "Start here" }).getByRole("link");
+  await expect(actions).toHaveCount(4);
+  for (const [label, href] of routes) {
+    await expect(hero.getByRole("navigation", { name: "Start here" }).getByRole("link", { name: new RegExp(`^${label}`) })).toHaveAttribute("href", href);
+  }
+  for (const [label, href] of routes) {
+    await page.goto("/", { waitUntil: "networkidle" });
+    await hero.getByRole("navigation", { name: "Start here" }).getByRole("link", { name: new RegExp(`^${label}`) }).click();
+    await expect(page).toHaveURL(new RegExp(`${href}$`));
+    await expect(page.locator("main h1")).toHaveCount(1);
+  }
 });
 
-test("signature reveal precedes identity emphasis and reduced motion shows everything immediately", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.reload({ waitUntil: "networkidle" });
-  const motion = await page.locator("[data-leadership-signature]").evaluate((image) => {
-    const animation = image.getAnimations()[0];
-    animation.pause();
-    animation.currentTime = 0;
-    const start = getComputedStyle(image).clipPath;
-    animation.currentTime = 800;
-    const middle = getComputedStyle(image).clipPath;
-    animation.currentTime = 1600;
-    const end = getComputedStyle(image).clipPath;
-    const timing = animation.effect!.getTiming();
-    const wordmark = document.querySelector("#playbook-title")!;
-    return { start, middle, end, duration: timing.duration, iterations: timing.iterations, identityDelay: getComputedStyle(wordmark).animationDelay };
+test("header notices and the old leadership letter are gone", async ({ page }) => {
+  await expect(page.getByText("Concept demonstration", { exact: false })).toHaveCount(0);
+  await expect(page.getByText("Plays are examples", { exact: false })).toHaveCount(0);
+  await expect(page.getByText("Not an endorsement", { exact: false })).toHaveCount(0);
+  await expect(page.getByText("Not a CSAF endorsement", { exact: false })).toHaveCount(0);
+  await expect(page.locator("#leadership-source, [data-leadership-signature]")).toHaveCount(0);
+  await expect(page.getByText("First letter to the force")).toHaveCount(0);
+  const html = await page.content();
+  expect(html).not.toContain("csaf-first-letter");
+  expect(html).not.toContain("csaf-wilsbach-signature");
+});
+
+test("header uses the Air Force symbol at its native proportions", async ({ page }) => {
+  const symbol = page.locator("header img.site-brand-symbol");
+  await expect(symbol).toHaveAttribute("src", "/assets/af-symbol-white.svg");
+  await expect(symbol).toHaveAttribute("alt", "U.S. Air Force symbol");
+  expect(await symbol.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
+  const rendered = await symbol.boundingBox();
+  expect(rendered!.width / rendered!.height).toBeCloseTo(338.667 / 264.018, 1);
+  await expect(page.locator("header").getByText("AP", { exact: true })).toHaveCount(0);
+});
+
+test("the approved memorandum is shown only when one has been supplied", async ({ page }) => {
+  const memo = page.getByTestId("leadership-memo");
+  if (!APPROVED_MEMO) {
+    await expect(memo).toHaveCount(0);
+    return;
+  }
+  await expect(memo.getByRole("heading", { name: APPROVED_MEMO.heading })).toBeVisible();
+  await expect(memo.locator("time")).toHaveAttribute("datetime", APPROVED_MEMO.date.iso);
+  await expect(memo).toContainText(`SUBJECT: ${APPROVED_MEMO.subject}`);
+  if (APPROVED_MEMO.isSeparatePageMfr) await expect(memo).not.toContainText("FROM:");
+  for (const block of APPROVED_MEMO.body) await expect(memo).toContainText(block.text);
+  await expect(memo.locator("svg[role='img']")).toHaveAttribute("aria-label", APPROVED_MEMO.signature.alt);
+  await expect(memo).toContainText(APPROVED_MEMO.endorsement);
+  // Memo sits directly below the hero.
+  const order = await page.evaluate(() => {
+    const hero = document.querySelector("section[aria-labelledby='playbook-title']")!;
+    return hero.nextElementSibling?.getAttribute("data-testid");
   });
-  expect(motion.start).toBe("inset(0px 100% 0px 0px)");
-  expect(motion.middle).not.toBe(motion.start);
-  expect(motion.middle).not.toBe(motion.end);
-  expect(motion.end).toBe("inset(0px 0% 0px 0px)");
-  expect(motion.duration).toBe(1600);
-  expect(motion.iterations).toBe(1);
-  expect(motion.identityDelay).toBe("1.5s");
+  expect(order).toBe("leadership-memo");
+  // Reduced motion: the complete static signature, no animation.
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await expect(page.locator("[data-leadership-signature]")).toHaveCSS("animation-name", "none");
-  await expect(page.locator("#playbook-title")).toHaveCSS("animation-name", "none");
-  await expect(page.locator("#playbook-title")).toHaveCSS("opacity", "1");
-  await expect(page.getByRole("link", { name: "Find your next move", exact: true })).toBeVisible();
+  await page.reload({ waitUntil: "networkidle" });
+  await expect(memo.locator("svg[role='img']")).toHaveAttribute("data-phase", "static");
 });
 
 test("optional setup saves preferences and saved items remain removable", async ({ page }) => {
@@ -74,9 +87,9 @@ test("optional setup saves preferences and saved items remain removable", async 
   const reference = page.locator("[data-home-reference]");
   await expect(reference).toContainText("Find a tool");
   await expect(reference.getByRole("link", { name: "Start here", exact: true })).toHaveAttribute("href", "/tools");
-  await page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Tools", exact: true }).click();
+  await page.goto("/tools", { waitUntil: "networkidle" });
   await page.getByRole("button", { name: "Add GenAI.mil to Home", exact: true }).click();
-  await page.getByRole("link", { name: "Airman's AI Playbook home", exact: true }).click();
+  await page.getByRole("banner").getByRole("link", { name: /Airman's AI Playbook/ }).click();
   await expect(reference.getByRole("link", { name: "Tool GenAI.mil", exact: true })).toHaveAttribute("href", "https://genai.mil");
   await reference.getByRole("button", { name: "Remove GenAI.mil", exact: true }).click();
   await expect(reference.getByText("Star a play or tool to save it here", { exact: false })).toBeVisible();
@@ -94,7 +107,8 @@ test("reference tabs, strategy disclosures, and source filters retain keyboard a
   await expect(reference.getByRole("tab", { name: "Strategy", exact: true })).toHaveAttribute("aria-selected", "true");
   const panel = reference.getByRole("tabpanel");
   await expect(panel).toHaveCount(1);
-  await expect(panel).toContainText("Not a CSAF endorsement.");
+  await expect(panel).toContainText("A practical response to published direction.");
+  await expect(panel).not.toContainText("endorsement");
   for (const doc of STRATEGY_STACK) {
     const disclosure = panel.getByRole("button", { name: new RegExp(doc.title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) });
     await disclosure.click();
@@ -119,11 +133,6 @@ test("reference tabs, strategy disclosures, and source filters retain keyboard a
 });
 
 test("adoption actions, global search, strategy and guide remain reachable", async ({ page }) => {
-  await expect(page.getByRole("link", { name: "Find your next move", exact: true })).toHaveAttribute("href", "/plays");
-  const progression = page.getByRole("navigation", { name: "From leadership intent to mission execution" });
-  await expect(progression.getByRole("link")).toHaveCount(4);
-  await progression.getByRole("link", { name: /Airman adoption/ }).click();
-  await expect(page).toHaveURL(/#start-here$/);
   await page.getByRole("button", { name: "Read the user guide", exact: true }).click();
   await expect(page.getByRole("dialog", { name: "User Guide" })).toBeVisible();
   await page.keyboard.press("Escape");
@@ -134,19 +143,17 @@ test("adoption actions, global search, strategy and guide remain reachable", asy
 });
 
 for (const width of [1440, 1024, 768, 390]) {
-  test(`leadership composition and home reference accessibility at ${width}px`, async ({ page }, testInfo) => {
+  test(`home composition and reference accessibility at ${width}px`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
-    await page.screenshot({ path: testInfo.outputPath(`leadership-${width}.png`), fullPage: true });
-    if (width === 390) {
-      const quote = await page.locator("#leadership-source blockquote").boundingBox();
-      expect(quote!.y + quote!.height).toBeLessThan(700);
-      const title = await page.locator("#playbook-title").boundingBox();
-      expect(title!.y).toBeLessThan(900);
-      const cta = await page.getByRole("link", { name: "Find your next move", exact: true }).boundingBox();
-      expect(cta!.y + cta!.height).toBeLessThan(1200);
-    }
+    await page.screenshot({ path: testInfo.outputPath(`home-${width}.png`), fullPage: true });
+    const title = await page.locator("#playbook-title").boundingBox();
+    expect(title!.y).toBeLessThan(500);
+    const actions = await page.getByRole("navigation", { name: "Start here" }).getByRole("link").evaluateAll((links) => links.map((link) => link.getBoundingClientRect().height));
+    expect(Math.min(...actions)).toBeGreaterThanOrEqual(44);
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
     for (const tab of ["Saved work", "Strategy", "Sources"]) {
       await page.getByRole("tab", { name: tab, exact: true }).click();
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);

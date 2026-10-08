@@ -6,17 +6,19 @@ import { LEARNING_PATHS } from "@/content/learningPaths";
 import { FEATURES } from "@/lib/features";
 import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
 import HomeSections from "@/components/HomeSections";
-import LeadershipHero from "@/components/LeadershipHero";
+import HomeHero from "@/components/HomeHero";
+import MfrMemo from "@/components/MfrMemo";
+import { APPROVED_MEMO } from "@/content/memo";
 import { Photo, PhotoCredit } from "@/components/Photograph";
 import { PHOTOGRAPHS } from "@/content/photography";
 import styles from "./home.module.css";
 
 const paths = [
   {
-    href: "/plays",
+    href: "/communities",
     title: "Execute a task",
-    label: "The plays",
-    body: "Get the safe starting move for the situation in front of you. Fill it in, run it, and check it before your name goes on it.",
+    label: "Plays, in communities",
+    body: "Open your community and get the safe starting move for the situation in front of you. Fill it in, run it, and check it before your name goes on it.",
   },
   {
     href: "/tools",
@@ -41,7 +43,8 @@ const levels = [
 export default function HomePage() {
   return (
     <div className={`${styles.home} bleed`}>
-      <LeadershipHero />
+      <HomeHero />
+      {APPROVED_MEMO && <MfrMemo memo={APPROVED_MEMO} />}
 
       <section className={`${styles.band} ${styles.statement}`} aria-labelledby="statement-title">
         <div className={`${styles.inner} ${styles.statementGrid}`}>
@@ -54,7 +57,7 @@ export default function HomePage() {
               The Department of the Air Force has called for an AI-first force. This is the practical response:
               approved tools, ready plays, and the guidance to use them well, in the work already in front of you.
             </p>
-            <Link href="/plays" className={styles.solidLink}>Browse the plays <ArrowRight size={18} aria-hidden="true" /></Link>
+            <Link href="/communities" className={styles.solidLink}>Browse communities <ArrowRight size={18} aria-hidden="true" /></Link>
           </div>
           <figure className={`${styles.plate} rise`}>
             <div className={`${styles.frame} ${styles.frameTall}`}>
@@ -148,8 +151,9 @@ export default function HomePage() {
             <div className={styles.searchShortcuts} aria-label="Suggested searches">
               <span>Start with</span>
               {[
-                ["2A", "/search?q=2A"],
-                ["Awards", "/search?q=awards"],
+                ["2A6X1", "/search?q=2A6X1"],
+                ["EPB", "/search?q=EPB"],
+                ["UDM", "/search?q=UDM"],
                 ["MFR", "/search?q=MFR"],
                 ["Tools", "/search?kind=tool"],
                 ...(FEATURES.communities ? [["Communities", "/search?kind=community"]] : []),

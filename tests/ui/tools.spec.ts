@@ -66,7 +66,7 @@ test("all tools retain source descriptions, launch links, status, and coming-soo
       await expect(dialog.locator("button[aria-pressed='false']")).toHaveCount(tool.access_path.length);
       await expect(dialog.getByRole("link", { name: "Report an issue" })).toHaveAttribute("target", "_blank");
       for (const playId of tool.play_ids) {
-        await expect(dialog.locator(`a[href="/plays#${playId}"]`)).toHaveCount(1);
+        await expect(dialog.locator(`a[href$="#${playId}"][href^="/communities/"]`)).toHaveCount(1);
       }
       if (tool.path_pending_verification) {
         await expect(dialog.getByText("Exact steps pending verification")).toBeVisible();
@@ -151,25 +151,21 @@ for (const width of [1440, 1024, 768, 390]) {
     await page.screenshot({ path: testInfo.outputPath(`tools-${width}.png`), fullPage: true });
     const accessibility = await new AxeBuilder({ page }).analyze();
     expect(accessibility.violations).toEqual([]);
-    if (width < 1120) {
-      const menu = page.getByRole("button", { name: "Menu", exact: true });
-      await menu.focus();
-      await page.keyboard.press("Enter");
-      const nav = page.getByRole("navigation", { name: "Main navigation" });
-      await expect(nav).toBeVisible();
-      await page.keyboard.press("Tab");
-      await expect(nav.getByRole("link", { name: "Tools", exact: true })).toBeFocused();
-      expect(await page.evaluate(() => {
-        const style = getComputedStyle(document.activeElement!);
-        return style.outlineStyle !== "none" && parseFloat(style.outlineWidth) >= 2;
-      })).toBe(true);
-      await page.keyboard.press("Escape");
-      await expect(menu).toBeFocused();
-      await expect(nav).toBeHidden();
-    } else {
-      await expect(page.getByRole("navigation", { name: "Main navigation" })
-        .getByRole("link", { name: "Tools", exact: true })).toHaveAttribute("aria-current", "page");
-    }
+    const menu = page.getByRole("button", { name: "Menu", exact: true });
+    await menu.focus();
+    await page.keyboard.press("Enter");
+    const drawer = page.getByRole("dialog", { name: "Site menu" });
+    await expect(drawer).toBeVisible();
+    await page.keyboard.press("Tab");
+    await expect(drawer.getByRole("link", { name: /^Communities/ })).toBeFocused();
+    expect(await page.evaluate(() => {
+      const style = getComputedStyle(document.activeElement!);
+      return style.outlineStyle !== "none" && parseFloat(style.outlineWidth) >= 2;
+    })).toBe(true);
+    await expect(drawer.getByRole("link", { name: /^Tools/ })).toHaveAttribute("aria-current", "page");
+    await page.keyboard.press("Escape");
+    await expect(menu).toBeFocused();
+    await expect(drawer).toHaveCount(0);
     const card = page.locator("#tool-row-t1");
     await card.getByRole("button", { name: /^View / }).click();
     if (width >= 1024) {
@@ -188,19 +184,22 @@ test("shared navigation preserves routes and guide access without interrupting f
   test.setTimeout(120_000);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  for (const [label, route] of [["Plays", "/plays"], ["Comms", "/communities"], ["Learn", "/ai-automation"], ["Search", "/search"], ["Tools", "/tools"]]) {
-    await page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: label, exact: true }).click();
+  for (const [label, route] of [["Communities", "/communities"], ["Learn", "/ai-automation"], ["Tools", "/tools"]]) {
+    await page.goto("/", { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Menu", exact: true }).click();
+    await page.getByRole("dialog", { name: "Site menu" }).getByRole("link", { name: new RegExp(`^${label}`) }).click();
     await expect(page).toHaveURL(new RegExp(`${route}$`));
     await expect(page.locator("main h1")).toHaveCount(1);
-    if (route === "/plays") {
-      const expand = page.getByRole("button", { name: "Expand play", exact: true }).first();
-      await expand.click();
-      await expect(page.getByRole("dialog", { name: "Deep Research Brief", exact: true })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Close details", exact: true })).toBeFocused();
-      await page.keyboard.press("Escape");
-      await expect(expand).toBeFocused();
-    }
   }
+  await page.goto("/communities/front-office-admin", { waitUntil: "networkidle" });
+  const expand = page.getByRole("button", { name: "Expand play", exact: true }).first();
+  await expand.click();
+  await expect(page.getByRole("dialog", { name: "MFR in One Pass", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Close details", exact: true })).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(expand).toBeFocused();
+  await page.getByRole("banner").getByRole("link", { name: "Search" }).click();
+  await expect(page).toHaveURL(/\/search$/);
   await page.getByRole("navigation", { name: "Support" }).getByRole("button", { name: "User guide" }).click();
   await expect(page.getByRole("dialog", { name: "User Guide" })).toBeVisible();
   await page.keyboard.press("Escape");

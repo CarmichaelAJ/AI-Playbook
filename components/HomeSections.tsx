@@ -79,7 +79,7 @@ function MyShelf() {
               Star a play or tool to save it here — discover on your phone, run it at your workstation.
             </p>
             <div className={styles.links}>
-              <Link href="/plays" className={styles.textAction}>Browse plays <ArrowRight size={15} aria-hidden="true" /></Link>
+              <Link href="/communities" className={styles.textAction}>Browse communities <ArrowRight size={15} aria-hidden="true" /></Link>
               <Link href="/tools" className={styles.textAction}>Browse tools <ArrowRight size={15} aria-hidden="true" /></Link>
             </div>
           </div>
@@ -197,7 +197,7 @@ function StrategyStack() {
         <p className={styles.description}>
           Trace institutional direction to Airman adoption and mission execution. Open each source for its practical meaning and published basis.
         </p>
-        <p className={styles.attribution}>A practical response to published direction. Not a CSAF endorsement.</p>
+        <p className={styles.attribution}>A practical response to published direction.</p>
       </div>
       <div>
         <ol className={styles.strategyRail}>
@@ -207,7 +207,7 @@ function StrategyStack() {
           <p className={styles.eyebrow}>Airman adoption / Mission execution</p>
           <h4 className={styles.practiceTitle}>Apply it to the task.</h4>
           <p className={styles.description}>Choose a play, use an appropriate tool, and verify the result before it informs your work.</p>
-          <Link href="/plays" className={styles.textAction}>Find a practical starting point <ArrowRight size={15} aria-hidden="true" /></Link>
+          <Link href="/communities" className={styles.textAction}>Find a practical starting point <ArrowRight size={15} aria-hidden="true" /></Link>
         </div>
       </div>
     </div>

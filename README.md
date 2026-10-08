@@ -92,9 +92,10 @@ The site is art-directed as an editorial, institutional experience rather
 than an application. Each page is a sequence of full-bleed scenes that alternate
 architectural darkness and light stone: a cinematic hero, a typographic
 statement with a photographic plate, a dark feature, an interactive section,
-and a closing statement. The home page carries the sequence **leadership
-intent, institutional direction, Airman adoption, mission execution**. The
-primary navigation is unchanged.
+and a closing statement. The header carries the Air Force symbol, **Search**,
+**Sign in**, and a **Menu** button that opens a side menu (Communities, Tools,
+Learn, and secondary pages). Plays are not a navigation item; they are browsed
+inside Communities.
 
 - **Typography** carries the monumental scale. Libre Caslon Display and Text
   (display and quotations) and Public Sans (interface) are self-hosted under the
@@ -105,13 +106,13 @@ primary navigation is unchanged.
   There are no literal columns, seals, or repeated insignia.
 - **Dark scenes** use a CSS grade (gradient and navy multiply) over the
   photograph. Images are never edited; tone is adjusted only in CSS.
-- **Motion** is restrained and optional: the signature reveal and identity
-  resolve in the hero, a slow settle on the hero photograph, and scroll-linked
+- **Motion** is restrained and optional: the identity resolve in the hero,
+  the memorandum signature draw-on, a slow settle on the hero photograph, and scroll-linked
   reveals and photographic drift (`.rise`, `.drift` in
   [app/globals.css](app/globals.css)). Scroll-linked effects use CSS only and are
   disabled by `prefers-reduced-motion` and unsupported browsers, where all content
   is simply visible.
-- [PageHero](components/PageHero.tsx) gives Tools, Plays, Comms, Learn, and
+- [PageHero](components/PageHero.tsx) gives Tools, Communities, Learn, and
   Search the same cinematic header, each with its own photograph or none.
 
 Shared tokens live in [app/globals.css](app/globals.css); home scenes in
@@ -136,28 +137,28 @@ and use `<Photo id="…">`. Showing a photograph does not imply endorsement by t
 people or units pictured. If no suitable authentic photograph exists, use no
 image rather than a substitute.
 
-### Leadership source and signature
+### Home hero and leadership memorandum
 
-The opening pairs a quotation and authentic signature from Gen. Kenneth S.
-Wilsbach's **3 November 2025 first letter to the force** with the Playbook's
-identity. It represents published leadership intent, **not an endorsement of
-this product**. The AI strategy is separately attributed to its foreword's
-signatory, Secretary of the Air Force Troy E. Meink. Do not combine the CSAF
-signature with new language in a way that implies he signed or approved it.
+The hero is the full-screen H1 plus four real routes: **Communities**, **Search**,
+**Tools**, and **Sign in** ([components/HomeHero.tsx](components/HomeHero.tsx)).
+None of them scroll within the page.
 
-- [Official letter](https://www.af.mil/Portals/1/documents/2025SAF/24th_CSAF_First_Letter_to_the_Force.pdf)
-- [Archived copy of the official URL](https://web.archive.org/web/20260123235149/https://www.af.mil/Portals/1/documents/2025SAF/24th_CSAF_First_Letter_to_the_Force.pdf), retrieved because the live endpoint returned HTTP 403 during implementation.
-- [Complete local source PDF](public/docs/csaf-first-letter-2025-11-03.pdf), a public U.S. government communication; SHA-256: `d00219b5541287ba40505f4adfb9c20c0c0785c5cf69de3cf1c2722bfecb004c`.
-- [Signature asset](public/assets/csaf-wilsbach-signature.png): page 1 cropped at PDF coordinates `(319, 660, 468, 694.5)` and rendered at 4x with PyMuPDF. The ink is not traced, synthesized, or retouched.
-- [Source metadata](content/leadership.ts) and [hero component](components/LeadershipHero.tsx) keep the date, author, quotation, document links, and non-endorsement disclosure together.
+The approved memorandum is rendered directly below the hero by
+[components/MfrMemo.tsx](components/MfrMemo.tsx) in the separate-page MFR layout of
+AFH 33-337, *The Tongue and Quill*, Chapter 14 (pp. 190-191, 27 May 2015 edition):
+letterhead, date flush right, "MEMORANDUM FOR RECORD", SUBJECT, numbered
+paragraphs, signature and a modified signature block about 4.5 in from the left
+edge, and no FROM line. The layout only arranges supplied data; all wording
+lives in [content/memo.ts](content/memo.ts). The signature is drawn on by
+[components/SignatureDraw.tsx](components/SignatureDraw.tsx), which shows the
+complete static signature for reduced motion, print, and no JavaScript.
 
-The signature is shown as white ink on night (inverted and screened from the
-original scan) and receives a single 1.6-second reveal; the identity resolves
-after 1.5 seconds. This reveals the scan, not a reconstruction of the signing
-gesture. Navigation and actions are never blocked by the animation.
-`prefers-reduced-motion` shows the complete composition immediately, as does
-the static fallback without animation support. Provenance links remain
-available under **About the signature & its source**.
+**Status: no approved memorandum, letterhead, signature artwork, or endorsement
+attribution has been supplied, so `APPROVED_MEMO` is `null` and nothing is
+shown.** The old CSAF letter, quote, signature, and non-endorsement wording were
+removed. See [docs/MEMO_INTAKE.md](docs/MEMO_INTAKE.md) for what to supply and
+how to install it. The layout is a reference-based implementation; confirm the
+current edition and any command or local guidance before calling it compliant.
 
 First-visit setup is intentionally **optional**, so it no longer covers the
 opening. **Set up Home** and **Change setup** retain the existing device-local
@@ -187,14 +188,45 @@ The test runner starts a static-mode preview on `127.0.0.1:3100`, or reuses an
 existing preview there outside CI. Keep that port in **static mode** when
 reusing it. Tests cover search/filter combinations, all roster entries, saved
 state, access paths, clipboard feedback, optional setup, reference tabs and
-source filters. Leadership tests also verify the source PDF hash, quote
-attribution, signature asset, animation sequence, and reduced-motion behavior.
+source filters. Home tests verify the four hero routes, removed notices, the
+Air Force symbol, and the memorandum structure when one is installed.
+Navigation tests drive the side menu by keyboard and pointer on desktop and
+mobile; community tests cover the hierarchy, aliases, multi-community plays,
+search, and the absence of a Plays page. `npm run test:unit` runs the
+community-graph and memo validation tests alone.
 Axe checks cover the directory and all three home reference views at 1440,
 1024, 768, and 390 pixels. Screenshots and failure traces are written
 to the ignored `test-results/` directory. These checks complement, rather than
 replace, a rendered visual review and `npm run build:static` /
 `npm run build:platform`. Backend-dependent platform actions still require the
 container stack.
+
+## Communities and plays
+
+Plays exist only inside communities. Communities form a hierarchy from broad to
+narrow (community, career field, AFSC, shredout, special duty, role, task
+area) and a community may have several parents.
+
+- [content/communities.ts](content/communities.ts): communities, aliases, task language.
+- [content/playCommunities.ts](content/playCommunities.ts): which plays are in which
+  communities (one play can be in many) and community-specific adaptations that
+  point at a base play instead of copying it.
+- [lib/communityGraph.ts](lib/communityGraph.ts): ancestors, descendants, play
+  links, and `validateCommunityData`.
+- [app/communities/](app/communities) and [components/CommunityDetail.tsx](components/CommunityDetail.tsx):
+  the browse page and one static page per community.
+
+The vocabulary is a working one pending SME review. It is **not** an
+authoritative AFSC mapping. The old `/plays` URL redirects to `/communities` in
+Nginx and on Vercel.
+
+## Restricted content
+
+Everything in this repository is public. The site is a static export, so
+classification-based visibility cannot be enforced here. No access policy or
+backend has been supplied; see
+[docs/RESTRICTED_CONTENT_REQUIREMENTS.md](docs/RESTRICTED_CONTENT_REQUIREMENTS.md).
+This application is not approved to process any classification level.
 
 ## Handling
 

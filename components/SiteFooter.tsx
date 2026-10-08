@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { PRODUCT_NAME } from "@/lib/branding";
 import { FEATURES } from "@/lib/features";
-import { PRIMARY_NAVIGATION } from "@/lib/navigation";
+import { MENU_NAVIGATION, SEARCH_LINK } from "@/lib/navigation";
 import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
 
 export default function SiteFooter() {
@@ -18,7 +18,8 @@ export default function SiteFooter() {
             <p>Practical tools. Clear guidance.<br />Your next move, made easier.</p>
           </div>
           <nav aria-label="Footer navigation">
-            {PRIMARY_NAVIGATION.map(({ href, label }) => <Link key={href} href={href}>{label}</Link>)}
+            {MENU_NAVIGATION.filter(({ href }) => href !== "/credits" && href !== "/settings").map(({ href, label }) => <Link key={href} href={href}>{label}</Link>)}
+            {SEARCH_LINK && <Link href={SEARCH_LINK.href}>{SEARCH_LINK.label}</Link>}
           </nav>
           <nav aria-label="Support">
             <button type="button" onClick={() => window.dispatchEvent(new Event("ap:open-guide"))}>User guide</button>
@@ -31,7 +32,6 @@ export default function SiteFooter() {
           </nav>
         </div>
         <div className="site-footer-note">
-          <span>A concept demonstration. Not an official endorsement.</span>
           <span>Verify access locally. Follow your unit&apos;s guidance.</span>
         </div>
       </div>

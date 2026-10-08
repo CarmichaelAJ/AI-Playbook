@@ -1,7 +1,8 @@
 import { PLAY_CATEGORIES, categoryLabel } from "@/content/categories";
 import { PLAYS } from "@/content/plays";
 import { ALL_LIBRARY } from "@/content/library";
-import { SOURCE_COMMUNITIES } from "@/content/communities";
+import { COMMUNITIES, COMMUNITY_LEVEL_LABEL } from "@/content/communities";
+import { ancestorsOf, communitiesForPlay, playHref, relatedCommunityIds } from "@/lib/communityGraph";
 import { LEARNING_PATHS } from "@/content/learningPaths";
 import { SECTIONS, TOOLS } from "@/lib/mock/tools";
 
@@ -15,39 +16,57 @@ export interface SearchItem {
   url: string;
   tags: string[];
   keywords: string;
+  // Communities a play belongs to, so a result always shows where the play lives.
+  communities?: Array<{ id: string; name: string }>;
+  // Present on community results so an exact alias ("UDM", "2A6X1") can outrank looser matches.
+  aliases?: string[];
 }
+
+// Everything in this index ships to the browser. It must only ever contain public content;
+// restricted content has to come from an authenticated backend, never from this file.
 
 const sectionLabel = (id: string) => SECTIONS.find((s) => s.id === id)?.label ?? id;
 
 export const SEARCH_ITEMS: SearchItem[] = [
-  ...PLAYS.map((play): SearchItem => ({
-    id: `play:${play.id}`,
-    kind: "play",
-    title: play.title,
-    description: play.situation ?? play.contract ?? categoryLabel(play.category),
-    url: `/plays#${play.id}`,
-    tags: [
-      categoryLabel(play.category),
-      `Level ${play.level ?? 1}`,
-      ...play.connectors,
-      ...(play.run_on?.surfaces ?? []),
-    ],
-    keywords: [
-      play.title,
-      play.situation,
-      play.contract,
-      play.category,
-      categoryLabel(play.category),
-      play.time_back,
-      play.body_segments?.persona,
-      play.body_segments?.task,
-      play.body_segments?.format,
-      play.body_segments?.feed_slots.map((s) => `${s.label} ${s.placeholder}`).join(" "),
-      play.body_segments?.verify.join(" "),
-      play.connectors.join(" "),
-      play.run_on?.surfaces.join(" "),
-    ].filter(Boolean).join(" "),
-  })),
+  ...PLAYS.map((play): SearchItem => {
+    const homes = communitiesForPlay(play.id);
+    // Search by a community name, an alias, or a broader community's alias and still find the play.
+    const communityWords = homes.flatMap((community) => [
+      community.name,
+      ...community.aliases,
+      ...ancestorsOf(community.id).flatMap((ancestor) => [ancestor.name, ...ancestor.aliases]),
+    ]);
+    return {
+      id: `play:${play.id}`,
+      kind: "play",
+      title: play.title,
+      description: play.situation ?? play.contract ?? categoryLabel(play.category),
+      url: playHref(play.id),
+      communities: homes.map(({ id, name }) => ({ id, name })),
+      tags: [
+        categoryLabel(play.category),
+        `Level ${play.level ?? 1}`,
+        ...play.connectors,
+        ...(play.run_on?.surfaces ?? []),
+      ],
+      keywords: [
+        play.title,
+        play.situation,
+        play.contract,
+        play.category,
+        categoryLabel(play.category),
+        play.time_back,
+        play.body_segments?.persona,
+        play.body_segments?.task,
+        play.body_segments?.format,
+        play.body_segments?.feed_slots.map((s) => `${s.label} ${s.placeholder}`).join(" "),
+        play.body_segments?.verify.join(" "),
+        play.connectors.join(" "),
+        play.run_on?.surfaces.join(" "),
+        communityWords.join(" "),
+      ].filter(Boolean).join(" "),
+    };
+  }),
   ...TOOLS.map((tool): SearchItem => ({
     id: `tool:${tool.id}`,
     kind: "tool",
@@ -87,24 +106,30 @@ export const SEARCH_ITEMS: SearchItem[] = [
       doc.provenance?.map((p) => p.label).join(" "),
     ].filter(Boolean).join(" "),
   })),
-  ...SOURCE_COMMUNITIES.map((community): SearchItem => ({
-    id: `community:${community.id}`,
-    kind: "community",
-    title: community.name,
-    description: community.mission,
-    url: `/communities#${community.id}`,
-    tags: [community.kind.toUpperCase(), ...community.aliases.slice(0, 5)],
-    keywords: [
-      community.name,
-      community.kind,
-      community.aliases.join(" "),
-      community.mission,
-      community.commonWork.join(" "),
-      community.notes,
-      community.startingPlayIds.join(" "),
-      community.startingToolIds.join(" "),
-    ].join(" "),
-  })),
+  ...COMMUNITIES.map((community): SearchItem => {
+    const broader = ancestorsOf(community.id);
+    return {
+      id: `community:${community.id}`,
+      kind: "community",
+      title: community.name,
+      description: community.mission,
+      url: `/communities/${community.id}`,
+      aliases: community.aliases,
+      tags: [
+        COMMUNITY_LEVEL_LABEL[community.level],
+        ...community.aliases.slice(0, 5),
+        ...(broader.length > 0 ? [`Under ${broader[broader.length - 1].name}`] : []),
+      ],
+      keywords: [
+        community.name,
+        COMMUNITY_LEVEL_LABEL[community.level],
+        community.aliases.join(" "),
+        community.mission,
+        community.commonWork.join(" "),
+        broader.map((b) => `${b.name} ${b.aliases.join(" ")}`).join(" "),
+      ].join(" "),
+    };
+  }),
   ...LEARNING_PATHS.map((path): SearchItem => ({
     id: `learning:${path.id}`,
     kind: "learning",
@@ -173,14 +198,22 @@ export function searchItems(query: string, filters: { kind?: SearchKind | "all";
   ];
   const kind = filters.kind ?? "all";
   const community = filters.community && filters.community !== "all"
-    ? SOURCE_COMMUNITIES.find((c) => c.id === filters.community)
+    ? COMMUNITIES.find((c) => c.id === filters.community)
     : null;
+  // Plays and communities are limited to the chosen community, the ones above it, and the ones below it.
+  const related = community ? relatedCommunityIds(community.id) : null;
   const communityTerms = community
     ? tokens([community.name, community.aliases.join(" "), community.commonWork.join(" ")].join(" "))
     : [];
 
   return SEARCH_ITEMS
     .filter((item) => kind === "all" || item.kind === kind)
+    .filter((item) => {
+      if (!related) return true;
+      if (item.kind === "community") return related.has(item.id.replace("community:", ""));
+      if (item.kind === "play") return (item.communities ?? []).some((c) => related.has(c.id));
+      return true;
+    })
     .map((item) => {
       const title = normalize(item.title);
       const haystack = normalize(`${item.title} ${item.description} ${item.tags.join(" ")} ${item.keywords}`);
@@ -188,6 +221,8 @@ export function searchItems(query: string, filters: { kind?: SearchKind | "all";
       let score = query.trim() ? 0 : 1;
 
       if (q && title === q) score += 100;
+      // An exact alias ("UDM", "2A6X1") should put its community first.
+      if (q && item.aliases?.some((alias) => normalize(alias) === q)) score += 90;
       if (q && title.includes(q)) score += 45;
       if (q && haystack.includes(q)) score += 20;
       for (const part of expandedParts) {
@@ -217,4 +252,4 @@ export const SEARCH_KINDS: Array<{ id: SearchKind | "all"; label: string }> = [
   { id: "learning", label: "Learning" },
 ];
 
-export { PLAY_CATEGORIES, SOURCE_COMMUNITIES };
+export { PLAY_CATEGORIES, COMMUNITIES };

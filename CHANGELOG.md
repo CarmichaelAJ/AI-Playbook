@@ -1,5 +1,25 @@
 # Changelog
 
+## [Unreleased] — Navigation, communities, and memorandum rework
+
+### Added
+- Header with the Air Force symbol (`public/assets/af-symbol-white.svg`), direct Search and Sign in, and a hamburger side menu that works by keyboard and pointer ([components/SiteHeader.tsx](components/SiteHeader.tsx)).
+- Full-screen home hero with four working routes ([components/HomeHero.tsx](components/HomeHero.tsx)) and a `/sign-in` route that reuses the existing account dialog.
+- Separate-page MFR component (AFH 33-337 Ch. 14), signature draw-on with a reduced-motion static state, and a memo data contract with validation ([components/MfrMemo.tsx](components/MfrMemo.tsx), [components/SignatureDraw.tsx](components/SignatureDraw.tsx), [content/memo.ts](content/memo.ts)). No approved memo has been supplied, so none is shown.
+- Community hierarchy with multiple parents and aliases, many-to-many play associations, adaptations that reference a base play, one static page per community, and graph validation ([lib/communityGraph.ts](lib/communityGraph.ts)).
+- Search matches community aliases and task language, and every play result shows its communities.
+- [docs/RESTRICTED_CONTENT_REQUIREMENTS.md](docs/RESTRICTED_CONTENT_REQUIREMENTS.md) and [docs/MEMO_INTAKE.md](docs/MEMO_INTAKE.md).
+- Navigation, community, home, and unit tests.
+
+### Removed
+- The standalone Plays page and navigation item (`/plays` redirects to `/communities`).
+- The "Concept demonstration" and "Plays are examples — check every draft before you sign it" header lines, and the "not an endorsement" wording in the hero, footer, and strategy section.
+- The old CSAF letter, quote, signature crop, and PDF.
+
+### Changed
+- Tool links, saved items, and report links open plays inside their home community.
+- Service worker cache bumped to v2 and no longer precaches `/plays`.
+
 All notable changes to Airman's AI Playbook's visual identity and front end.
 These changes are local and uncommitted; nothing has been deployed.
 

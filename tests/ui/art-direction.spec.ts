@@ -41,9 +41,10 @@ test("photographs on the home page credit their source", async ({ page }) => {
 
 for (const width of [1440, 390]) {
   test(`cinematic page headers are accessible without overflow at ${width}px`, async ({ page }) => {
+    test.setTimeout(120_000);
     await page.setViewportSize({ width, height: 900 });
     await page.emulateMedia({ reducedMotion: "reduce" });
-    for (const route of ["/tools", "/plays", "/communities", "/ai-automation", "/search", "/credits"]) {
+    for (const route of ["/tools", "/communities", "/communities/maintainers", "/sign-in", "/ai-automation", "/search", "/credits"]) {
       await page.goto(route, { waitUntil: "networkidle" });
       await expect(page.locator("main h1")).toHaveCount(1);
       await expect(page.locator(".page-hero")).toBeVisible();
