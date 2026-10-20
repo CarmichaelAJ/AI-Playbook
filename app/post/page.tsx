@@ -85,7 +85,7 @@ export default function PostPage() {
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-5">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <Link href={submission.kind === "tool" ? "/tools" : "/communities"} className="inline-flex items-center gap-1.5 text-xs font-bold text-primary">
+        <Link href={submission.kind === "community" ? "/communities" : `/${submission.kind}s`} className="inline-flex items-center gap-1.5 text-xs font-bold text-primary">
           <ArrowLeft size={15} /> Back
         </Link>
         <div className="flex items-center gap-2">

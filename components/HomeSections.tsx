@@ -1,28 +1,27 @@
 "use client";
 
-import { useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
+// Route stays /dashboard for link stability; everything user-facing is "HQ" (D13).
+// HQ is the Airman's headquarters: saved plays + approved launchpads (the personal
+// shelf), plus the official picture — strategy stack and dated, translated shelves.
+// No metrics, no analytics, nothing tracked.
+
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, ChevronDown, ExternalLink, X } from "lucide-react";
+import { Layers, Wrench, X, Star, ExternalLink, ShieldCheck, BookOpen, Settings2, ArrowRight } from "lucide-react";
+import ScrollReveal from "@/components/ScrollReveal";
 import { useFavorites } from "@/lib/favorites";
 import { FEATURES } from "@/lib/features";
 import { DEPTH_COPY, INTENT_COPY, openOnboarding, useOnboarding } from "@/lib/onboarding";
 import { STRATEGY_STACK, ALL_LIBRARY, SHELF_FILTERS, LATEST_IDS } from "@/content/library";
 import { PLAY_COUNT, SOURCE_COUNT } from "@/content/counts";
 import type { ContentItem } from "@/content/schema";
-import styles from "./HomeSections.module.css";
 
+// Approved AI launchpads — the fast front door (Envision has no public URL yet).
 const LAUNCHPADS = [
-  { name: "GenAI.mil", url: "https://genai.mil", note: "Start here" },
-  { name: "Ask Sage", url: "https://chat.asksage.ai", note: "Advanced" },
-  { name: "Envision", url: "", note: "Workstation" },
+  { name: "GenAI.mil", url: "https://genai.mil", icon: "🛡️", note: "Start here" },
+  { name: "Ask Sage", url: "https://chat.asksage.ai", icon: "🧭", note: "Advanced" },
+  { name: "Envision", url: "", icon: "🔭", note: "Workstation" },
 ];
-
-const VIEWS = [
-  ["home", "Saved work"],
-  ["strategy", "Strategy"],
-  ["sources", "Sources"],
-] as const;
-type View = (typeof VIEWS)[number][0];
 
 function verifiedLabel(iso?: string): string {
   if (!iso) return "verified";
@@ -39,287 +38,291 @@ function PersonalizedBrief() {
   if (!FEATURES.onboarding) return null;
 
   return (
-    <div className={styles.setup}>
-      <div>
-        <p className={styles.eyebrow}>Your setup</p>
-        <h3 className={styles.setupTitle}>{intent ? intent.label : "Choose where to begin"}</h3>
-        <p className={styles.description}>
-          {intent && depth ? `${intent.line} ${depth.line}` : "Pick a starting lane and depth. It stays on this device only."}
-        </p>
-      </div>
-      <div className={styles.setupActions}>
+    <ScrollReveal>
+      <div className="p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold text-silver uppercase tracking-wider">Your Setup</p>
+            <h2 className="text-sm font-bold text-primary-dark mt-1">
+              {intent ? intent.label : "Tell Home what to show first"}
+            </h2>
+            <p className="text-xs text-gray-500 leading-snug mt-1">
+              {intent && depth ? `${intent.line} ${depth.line}` : "Pick a starting lane and depth. It stays on this device only."}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={openOnboarding}
+            className="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-inner bg-primary/10 text-primary"
+            aria-label="Change Home setup"
+            title="Change Home setup"
+          >
+            <Settings2 size={17} />
+          </button>
+        </div>
+
         {intent ? (
-          <Link href={intent.href} className={styles.action}>
-            Start here <ArrowRight size={16} aria-hidden="true" />
+          <Link href={intent.href} className="mt-3 inline-flex items-center gap-2 rounded-badge bg-primary px-3 py-2 text-xs font-bold text-white">
+            Start here <ArrowRight size={14} />
           </Link>
         ) : (
-          <button type="button" onClick={openOnboarding} className={styles.action}>
-            Set up Home <ArrowRight size={16} aria-hidden="true" />
+          <button type="button" onClick={openOnboarding} className="mt-3 inline-flex items-center gap-2 rounded-badge bg-primary px-3 py-2 text-xs font-bold text-white">
+            Set up Home <ArrowRight size={14} />
           </button>
         )}
-        <button type="button" onClick={openOnboarding} className={styles.textAction} aria-label="Change Home setup">
-          Change setup
-        </button>
       </div>
-    </div>
+    </ScrollReveal>
   );
 }
 
+// ── Zone 1: My Shelf — saved plays/tools + approved launchpads ──
 function MyShelf() {
   const { items, remove } = useFavorites();
   return (
-    <div className={styles.workColumns}>
-      <section className={styles.saved}>
-        <p className={styles.eyebrow}>01 / Keep at hand</p>
-        <h3 className={styles.subheading}>Saved plays &amp; tools</h3>
-        {items.length === 0 ? (
-          <div className={styles.emptyState}>
-            <p className={styles.emptyTitle}>Your next task starts here.</p>
-            <p className={styles.description}>
-              Star a play or tool to save it here — discover on your phone, run it at your workstation.
-            </p>
-            <div className={styles.links}>
-              <Link href="/communities" className={styles.textAction}>Browse communities <ArrowRight size={15} aria-hidden="true" /></Link>
-              <Link href="/tools" className={styles.textAction}>Browse tools <ArrowRight size={15} aria-hidden="true" /></Link>
-            </div>
-          </div>
-        ) : (
-          <ul className={styles.savedList}>
-            {items.map((item) => {
-              const inner = (
-                <>
-                  <span className={styles.metadata}>{item.type === "play" ? "Play" : "Tool"}</span>
-                  <span className={styles.itemTitle}>{item.title}</span>
-                  {!item.url && <span className={styles.guidance}>Access guidance in Tools</span>}
-                </>
-              );
-              return (
-                <li key={item.id} className={styles.savedRow}>
-                  {item.url ? (
-                    item.url.startsWith("http") ? (
-                      <a href={item.url} target="_blank" rel="noopener noreferrer" className={styles.savedLink}>
-                        {inner}<ExternalLink size={15} aria-hidden="true" className={styles.savedExternal} />
-                      </a>
-                    ) : (
-                      <Link href={item.url} className={styles.savedLink}>{inner}</Link>
-                    )
-                  ) : (
-                    <div className={styles.savedLink}>{inner}</div>
-                  )}
-                  <button type="button" onClick={() => remove(item.id)} aria-label={`Remove ${item.title}`} className={styles.remove}>
-                    <X size={18} aria-hidden="true" />
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-        <p className={styles.deviceNote}>Saves stay on this device. No account; saved items are not sent anywhere.</p>
-      </section>
-      <section className={styles.launchpads}>
-        <p className={styles.eyebrow}>02 / Put it to work</p>
-        <h3 className={styles.subheading}>Open your workspace</h3>
-        <p className={styles.description}>Choose a launchpad for the task in front of you.</p>
-        <ol className={styles.launchpadList}>
-          {LAUNCHPADS.map(({ name, url, note }, index) => {
+    <ScrollReveal>
+      <div>
+        <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">My Shelf</p>
+
+        {/* Launchpads */}
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          {LAUNCHPADS.map(({ name, url, icon, note }) => {
             const inner = (
               <>
-                <span className={styles.rowNumber} aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-                <span className={styles.launchpadName}>{name}<span className={styles.launchpadNote}>{note}</span></span>
-                {url && <ExternalLink size={16} aria-hidden="true" />}
+                <span className="text-2xl leading-none">{icon}</span>
+                <span className="text-xs font-bold text-primary-dark leading-tight text-center">{name}</span>
+                <span className="text-[9px] font-semibold uppercase tracking-wide text-silver">{note}</span>
               </>
             );
-            return (
-              <li key={name}>
-                {url ? (
-                  <a href={url} target="_blank" rel="noopener noreferrer" className={styles.launchpad}>{inner}</a>
-                ) : (
-                  <div className={styles.launchpadUnavailable}>
-                    <div className={styles.launchpad}>{inner}</div>
-                    <p className={styles.guidance}>Access guidance in Tools</p>
-                  </div>
-                )}
-              </li>
+            const cls =
+              "flex flex-col items-center justify-center gap-1 p-3 rounded-card bg-white border border-silver-mid/40 shadow-resting text-center";
+            return url ? (
+              <a key={name} href={url} target="_blank" rel="noopener noreferrer" className={`${cls} active:bg-primary/5 transition-colors relative`}>
+                <ExternalLink size={11} className="absolute top-2 right-2 text-silver" />
+                {inner}
+              </a>
+            ) : (
+              <div key={name} className={`${cls} opacity-80`}>{inner}</div>
             );
           })}
-        </ol>
-        <Link href="/tools" className={styles.textAction}>View tools &amp; access guidance <ArrowRight size={15} aria-hidden="true" /></Link>
-      </section>
-    </div>
-  );
-}
+        </div>
 
-function SourceLinks({ doc }: { doc: ContentItem }) {
-  return (
-    <div className={styles.links}>
-      {doc.doc_class === "milestone" && doc.hosted_path && (
-        <Link href={`/reader/${doc.id}`} className={styles.textAction}>
-          Read it here <ArrowRight size={15} aria-hidden="true" />
-        </Link>
-      )}
-      {doc.official_url && (
-        <a href={doc.official_url} target="_blank" rel="noopener noreferrer" className={styles.textAction}>
-          Official source <ExternalLink size={14} aria-hidden="true" />
-        </a>
-      )}
-    </div>
-  );
-}
+        {/* Saved plays / tools */}
+        {items.length === 0 ? (
+          <div className="p-5 rounded-card bg-white border border-dashed border-silver-mid/70 text-center">
+            <div className="inline-flex p-2.5 rounded-inner bg-silver-tint mb-2">
+              <Star size={18} className="text-silver" />
+            </div>
+            <p className="text-xs text-gray-500 leading-snug">
+              Star a play or tool to pin it here — discover on your phone, run it at your workstation.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-2 md:grid-cols-2">
+            {items.map((item) => {
+              const Icon = item.type === "play" ? Layers : Wrench;
+              const isExternal = item.url.startsWith("http");
+              const Inner = (
+                <div className="flex items-center gap-3 p-3 rounded-card bg-white border border-silver-mid/40 shadow-resting flex-1 min-w-0">
+                  <div className="w-9 h-9 rounded-inner bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Icon size={16} className="text-primary" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-primary-dark leading-tight truncate">{item.title}</p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wide font-semibold">
+                      {item.type === "play" ? "Play" : "Tool"}
+                    </p>
+                  </div>
+                </div>
+              );
+              return (
+                <div key={item.id} className="flex items-stretch gap-2">
+                  {item.url ? (
+                    isExternal ? (
+                      <a href={item.url} target="_blank" rel="noopener noreferrer" className="flex flex-1 min-w-0">{Inner}</a>
+                    ) : (
+                      <Link href={item.url} className="flex flex-1 min-w-0">{Inner}</Link>
+                    )
+                  ) : (
+                    Inner
+                  )}
+                  <button
+                    onClick={() => remove(item.id)}
+                    aria-label={`Remove ${item.title}`}
+                    className="flex-shrink-0 w-9 flex items-center justify-center rounded-card bg-white border border-silver-mid/40 text-gray-400 hover:text-danger hover:border-danger/30 transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
-function StackRung({ doc, index }: { doc: ContentItem; index: number }) {
-  const [open, setOpen] = useState(false);
-  const id = useId();
-  return (
-    <li className={styles.stackRung}>
-      <span className={styles.railNumber} aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-      <button type="button" onClick={() => setOpen((value) => !value)} className={styles.disclosure} aria-expanded={open} aria-controls={`${id}-detail`}>
-        <span>
-          <span className={styles.itemTitle}>{doc.title}</span>
-          <span className={styles.sourceMetadata}>{doc.issuer} · {verifiedLabel(doc.verified_as_of)}</span>
-        </span>
-        <ChevronDown size={18} aria-hidden="true" className={open ? styles.chevronOpen : undefined} />
-      </button>
-      <div id={`${id}-detail`} hidden={!open} className={styles.stackDetail}>
-        <p className={styles.description}>{doc.translation_line}</p>
-        <SourceLinks doc={doc} />
+        <p className="text-[11px] text-gray-500 leading-snug px-1 mt-2">
+          Saves live on <span className="font-semibold text-primary-dark">this device</span>. No account, nothing leaves your phone.
+        </p>
       </div>
-    </li>
+    </ScrollReveal>
+  );
+}
+
+// ── Zone 3: Strategy Stack ──
+function StackRung({ doc }: { doc: ContentItem }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div>
+      <button onClick={() => setOpen((v) => !v)} className="w-full flex gap-3 text-left" aria-expanded={open}>
+        <div className="w-3 h-3 rounded-full bg-primary mt-1 flex-shrink-0" />
+        <div className="min-w-0 flex-1 pb-1">
+          <p className="text-xs font-bold text-primary-dark leading-tight">{doc.title}</p>
+          <p className="text-[10px] text-silver mt-0.5">
+            {doc.issuer} · <span className="text-success-mid font-semibold">✓ {verifiedLabel(doc.verified_as_of)}</span>
+          </p>
+          {open && (
+            <div className="text-[11px] text-primary-dark leading-snug bg-primary-ghost rounded-inner px-2.5 py-2 mt-1.5">
+              {doc.translation_line}
+              {doc.doc_class === "milestone" && doc.hosted_path ? (
+                <Link href={`/reader/${doc.id}`} className="ml-1 font-semibold text-primary underline underline-offset-2 whitespace-nowrap">
+                  Read it →
+                </Link>
+              ) : doc.official_url ? (
+                <a href={doc.official_url} target="_blank" rel="noopener noreferrer" className="ml-1 font-semibold text-primary underline underline-offset-2 whitespace-nowrap">
+                  Read it →
+                </a>
+              ) : null}
+            </div>
+          )}
+        </div>
+      </button>
+      <div className="w-px h-3 bg-silver-mid/60 ml-1.5" aria-hidden="true" />
+    </div>
   );
 }
 
 function StrategyStack() {
   const rungs = useMemo(() => [...STRATEGY_STACK].sort((a, b) => (a.stack_order ?? 0) - (b.stack_order ?? 0)), []);
   return (
-    <div className={styles.strategyColumns}>
-      <div className={styles.strategyIntroduction}>
-        <p className={styles.eyebrow}>Direction into practice</p>
-        <h3 className={styles.subheading}>The strategy stack</h3>
-        <p className={styles.description}>
-          Trace institutional direction to Airman adoption and mission execution. Open each source for its practical meaning and published basis.
-        </p>
-        <p className={styles.attribution}>A practical response to published direction.</p>
-      </div>
-      <div>
-        <ol className={styles.strategyRail}>
-          {rungs.map((doc, index) => <StackRung key={doc.id} doc={doc} index={index} />)}
-        </ol>
-        <div className={styles.practice}>
-          <p className={styles.eyebrow}>Airman adoption / Mission execution</p>
-          <h4 className={styles.practiceTitle}>Apply it to the task.</h4>
-          <p className={styles.description}>Choose a play, use an appropriate tool, and verify the result before it informs your work.</p>
-          <Link href="/communities" className={styles.textAction}>Find a practical starting point <ArrowRight size={15} aria-hidden="true" /></Link>
+    <ScrollReveal>
+      <div className="p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting">
+        <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-3">⛓ The Strategy Stack — where you fit</p>
+        {rungs.map((doc) => (
+          <StackRung key={doc.id} doc={doc} />
+        ))}
+        {/* YOU rung — green accent */}
+        <div className="flex gap-3">
+          <div className="w-3.5 h-3.5 rounded-full bg-success mt-1 flex-shrink-0 ring-4 ring-success-tint" />
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold text-success-mid leading-tight">YOU — this AI Playbook in your pocket</p>
+            <p className="text-[10px] text-silver mt-0.5">Built by Airmen · CSAF-endorsed · no CAC, no account</p>
+            <p className="text-[11px] text-gray-500 leading-snug mt-1">
+              Everything above lands here: the safe starting move for the task in front of you, today.
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </ScrollReveal>
   );
 }
 
-function DocRow({ doc, index }: { doc: ContentItem; index: number }) {
+// ── Zone 4: The Shelves ──
+function DocCard({ doc }: { doc: ContentItem }) {
+  const latest = LATEST_IDS.includes(doc.id);
   return (
-    <li className={styles.docRow}>
-      <span className={styles.rowNumber} aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-      <article className={styles.docContent}>
-        <div>
-          {LATEST_IDS.includes(doc.id) && <p className={styles.latest}>Latest</p>}
-          <h4 className={styles.docTitle}>{doc.title}</h4>
-          <p className={styles.sourceMetadata}>{doc.issuer} · {verifiedLabel(doc.verified_as_of)}</p>
-        </div>
-        <div>
-          <p className={styles.description}>{doc.translation_line}</p>
-          <SourceLinks doc={doc} />
-        </div>
-      </article>
-    </li>
+    <div className="p-3 rounded-card bg-white border border-silver-mid/40 shadow-resting">
+      {latest && <p className="text-[9px] font-extrabold uppercase tracking-widest text-af-red mb-1">● Latest</p>}
+      <p className="text-sm font-bold text-primary-dark leading-tight">{doc.title}</p>
+      <p className="text-[10px] text-silver mt-0.5">
+        {doc.issuer} · <span className="text-success-mid font-semibold">✓ {verifiedLabel(doc.verified_as_of)}</span>
+      </p>
+      <p className="text-[11px] text-gray-600 leading-snug mt-1.5">{doc.translation_line}</p>
+      {doc.doc_class === "milestone" && doc.hosted_path ? (
+        <span className="flex items-center gap-3 mt-1.5">
+          <Link href={`/reader/${doc.id}`} className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary">
+            Read it here <BookOpen size={11} />
+          </Link>
+          <a href={doc.official_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[11px] font-semibold text-gray-500">
+            Official source <ExternalLink size={11} />
+          </a>
+        </span>
+      ) : doc.official_url ? (
+        <a href={doc.official_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary mt-1.5">
+          Open official source <ExternalLink size={11} />
+        </a>
+      ) : null}
+    </div>
   );
 }
 
 function Shelves() {
   const [filter, setFilter] = useState("all");
   const docs = useMemo(
-    () => (filter === "all" ? ALL_LIBRARY : ALL_LIBRARY.filter((doc) => doc.category === filter)),
+    () => (filter === "all" ? ALL_LIBRARY : ALL_LIBRARY.filter((d) => d.category === filter)),
     [filter],
   );
-  const id = useId();
   return (
-    <div>
-      <p className={styles.eyebrow}>Read the published basis</p>
-      <h3 className={styles.subheading}>Source library</h3>
-      <p className={styles.description}>Official documents, practical translations, and dated source links.</p>
-      <div className={styles.filters} role="group" aria-label="Filter sources">
-        {SHELF_FILTERS.map((item) => (
-          <button key={item.id} type="button" onClick={() => setFilter(item.id)} aria-pressed={filter === item.id} aria-controls={`${id}-documents`} className={styles.filter}>
-            {item.label}
-          </button>
-        ))}
+    <ScrollReveal>
+      <div>
+        <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">The Shelves</p>
+        <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+          {SHELF_FILTERS.map((f) => (
+            <button
+              key={f.id}
+              onClick={() => setFilter(f.id)}
+              aria-pressed={filter === f.id}
+              className={`flex-shrink-0 text-[11px] font-semibold px-3 py-1.5 rounded-badge border transition-colors ${
+                filter === f.id
+                  ? "bg-primary border-primary text-white"
+                  : "bg-white border-silver-mid/60 text-primary-dark active:bg-primary/5"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        <div className="grid gap-2 md:grid-cols-2 mt-1">
+          {docs.map((doc) => (
+            <DocCard key={doc.id} doc={doc} />
+          ))}
+        </div>
+        <p className="text-[10px] text-gray-400 text-center leading-snug mt-3">
+          Curated, translated, dated — a common operating picture, not another SharePoint.
+        </p>
       </div>
-      <p className={styles.resultCount} role="status">{docs.length} {docs.length === 1 ? "source" : "sources"} shown</p>
-      <ol id={`${id}-documents`} className={styles.docList}>
-        {docs.map((doc, index) => <DocRow key={doc.id} doc={doc} index={index} />)}
-      </ol>
-    </div>
+    </ScrollReveal>
   );
 }
 
 export default function HomeSections() {
-  const [section, setSection] = useState<View>("home");
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const id = useId();
-
-  function onTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, index: number) {
-    let next: number;
-    switch (event.key) {
-      case "ArrowRight": next = (index + 1) % VIEWS.length; break;
-      case "ArrowLeft": next = (index + VIEWS.length - 1) % VIEWS.length; break;
-      case "Home": next = 0; break;
-      case "End": next = VIEWS.length - 1; break;
-      default: return;
-    }
-    event.preventDefault();
-    setSection(VIEWS[next][0]);
-    tabRefs.current[next]?.focus();
-  }
-
+  const [section, setSection] = useState<"home" | "strategy" | "sources">("home");
   return (
-    <section aria-labelledby={`${id}-heading`} className={styles.reference} data-home-reference>
-      <header className={styles.header}>
-        <div>
-          <p className={styles.eyebrow}>From direction to daily work</p>
-          <h2 id={`${id}-heading`} className={styles.heading}>Your working reference</h2>
-        </div>
-        <p className={styles.headerDescription}>Keep useful work close. Follow the strategy. Check the source.</p>
-      </header>
-      <div className={styles.tabs} role="tablist" aria-label="Home views">
-        {VIEWS.map(([view, label], index) => (
-          <button
-            key={view}
-            ref={(element) => { tabRefs.current[index] = element; }}
-            id={`${id}-tab-${view}`}
-            type="button"
-            role="tab"
-            aria-selected={section === view}
-            aria-controls={`${id}-panel-${view}`}
-            tabIndex={section === view ? 0 : -1}
-            onClick={() => setSection(view)}
-            onKeyDown={(event) => onTabKeyDown(event, index)}
-            className={styles.tab}
-          >
-            <span className={styles.tabNumber} aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+    <section aria-label="Your home setup" className="flex flex-col gap-5">
+      <div>
+        <p className="text-[10px] font-bold text-silver uppercase tracking-wider">Your Home</p>
+        <h2 className="mt-1 text-lg font-bold text-primary-dark">Saved work and official launchpads</h2>
+      </div>
+      <div className="grid grid-cols-3 gap-1 rounded-inner border border-silver-mid/50 bg-white p-1 shadow-resting" role="tablist" aria-label="Home views">
+        {([["home", "My Home"], ["strategy", "Strategy"], ["sources", "Sources"]] as const).map(([id, label]) => (
+          <button key={id} type="button" role="tab" aria-selected={section === id} onClick={() => setSection(id)} className={`min-h-10 rounded-inner px-2 text-xs font-bold ${section === id ? "bg-primary text-white" : "text-gray-500 hover:bg-primary-ghost"}`}>
             {label}
           </button>
         ))}
       </div>
-      {VIEWS.map(([view]) => (
-        <div key={view} id={`${id}-panel-${view}`} role="tabpanel" aria-labelledby={`${id}-tab-${view}`} tabIndex={0} hidden={section !== view} className={styles.panel}>
-          {view === "home" && <>{FEATURES.onboarding && <PersonalizedBrief />}<MyShelf /></>}
-          {view === "strategy" && <StrategyStack />}
-          {view === "sources" && <Shelves />}
-        </div>
-      ))}
-      <p className={styles.receipts}>
-        <span><strong>{PLAY_COUNT}</strong> deep plays</span>
-        <span><strong>{SOURCE_COUNT}</strong> official sources</span>
-        <span>Source links carry verification dates.</span>
-      </p>
+        {section === "home" && FEATURES.onboarding && <PersonalizedBrief />}
+        {section === "home" && <MyShelf />}
+
+        {/* Zone 2: Receipts strip — live counts from the content layer (not user metrics) */}
+        <ScrollReveal>
+          <div className="rounded-card bg-primary-dark text-white px-4 py-3 text-center flex items-center justify-center gap-1.5">
+            <ShieldCheck size={15} className="text-warm flex-shrink-0" />
+            <p className="text-[11px] leading-snug">
+              <span className="font-bold text-warm">{PLAY_COUNT}</span> deep plays ·{" "}
+              <span className="font-bold text-warm">{SOURCE_COUNT}</span>{" "}official sources — every link verified &amp; dated.
+            </p>
+          </div>
+        </ScrollReveal>
+
+        {section === "strategy" && <StrategyStack />}
+        {section === "sources" && <Shelves />}
     </section>
   );
 }

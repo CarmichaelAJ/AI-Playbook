@@ -3,8 +3,5 @@
   "framework": null,
   "buildCommand": "npm run build:static",
   "outputDirectory": "out",
-  "cleanUrls": true,
-  "redirects": [
-    { "source": "/plays", "destination": "/communities", "permanent": true }
-  ]
+  "cleanUrls": true
 }
