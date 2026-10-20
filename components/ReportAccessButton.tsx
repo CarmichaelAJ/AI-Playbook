@@ -27,7 +27,7 @@ export default function ReportAccessButton({
 
   if (!FEATURES.auth) {
     return (
-      <a href={SUGGEST_PLAY_FORM_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center gap-1.5 px-2 text-[11px] font-bold text-gray-500 hover:text-primary">
+      <a href={SUGGEST_PLAY_FORM_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-1.5 px-2 text-[11px] font-bold text-silver hover:text-primary">
         <Flag size={13} /> Report an issue
       </a>
     );
@@ -53,7 +53,7 @@ export default function ReportAccessButton({
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className="inline-flex min-h-9 items-center gap-1.5 px-2 text-[11px] font-bold text-gray-500 hover:text-primary">
+      <button type="button" onClick={() => setOpen(true)} className="inline-flex min-h-11 items-center gap-1.5 px-2 text-[11px] font-bold text-silver hover:text-primary">
         <Flag size={13} /> Report an issue
       </button>
       {open && (

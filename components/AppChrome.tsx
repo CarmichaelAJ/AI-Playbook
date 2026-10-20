@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import GuideModal from "./GuideModal";
 import OnboardingModal from "./OnboardingModal";
 import { FEATURES } from "@/lib/features";
-import { useOnboarding } from "@/lib/onboarding";
 import PlatformAccount from "./PlatformAccount";
 import OfflineSupport from "./OfflineSupport";
 
@@ -15,7 +14,6 @@ import OfflineSupport from "./OfflineSupport";
 export default function AppChrome() {
   const [guideOpen, setGuideOpen] = useState(false);
   const [onboardingOpen, setOnboardingOpen] = useState(false);
-  const { profile } = useOnboarding();
 
   useEffect(() => {
     const openModal = () => setGuideOpen(true);
@@ -29,11 +27,6 @@ export default function AppChrome() {
     window.addEventListener("ap:open-onboarding", openModal);
     return () => window.removeEventListener("ap:open-onboarding", openModal);
   }, []);
-
-  useEffect(() => {
-    if (!FEATURES.onboarding) return;
-    setOnboardingOpen(!profile.seen);
-  }, [profile.seen]);
 
   return (
     <>

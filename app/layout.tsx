@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import BottomNav from "@/components/BottomNav";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import AppChrome from "@/components/AppChrome";
 import { PRODUCT_NAME } from "@/lib/branding";
 
@@ -9,6 +10,20 @@ const publicSans = localFont({
   src: "./fonts/public-sans-latin.woff2",
   weight: "100 900",
   variable: "--font-public-sans",
+});
+
+const caslonDisplay = localFont({
+  src: "./fonts/libre-caslon-display-latin-400-normal.woff2",
+  weight: "400",
+  variable: "--font-caslon-display",
+});
+
+const caslonText = localFont({
+  src: [
+    { path: "./fonts/libre-caslon-text-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/libre-caslon-text-latin-400-italic.woff2", weight: "400", style: "italic" },
+  ],
+  variable: "--font-caslon-text",
 });
 
 const barlowCondensed = localFont({
@@ -30,7 +45,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#003087",
+  themeColor: "#07121d",
 };
 
 export default function RootLayout({
@@ -39,7 +54,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${publicSans.variable} ${barlowCondensed.variable} h-full`}>
+    <html lang="en" className={`${publicSans.variable} ${caslonDisplay.variable} ${caslonText.variable} ${barlowCondensed.variable} h-full`}>
       <body className="min-h-full bg-background text-foreground font-[family-name:var(--font-public-sans)]">
         <a
           href="#main-content"
@@ -47,13 +62,11 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <div className="max-w-lg md:max-w-3xl lg:max-w-6xl mx-auto min-h-screen relative lg:pl-20">
-          <div className="bg-warm text-primary-dark text-center text-[10px] font-bold uppercase tracking-widest py-1.5 px-4">
-            Concept demonstration. Plays are examples — check every draft before you sign it.
-          </div>
+        <div className="site-shell">
+          <SiteHeader />
           <AppChrome />
           <main id="main-content" tabIndex={-1} className="page-content">{children}</main>
-          <BottomNav />
+          <SiteFooter />
         </div>
       </body>
     </html>

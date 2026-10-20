@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import {
   ChevronDown, ChevronUp, Copy, Check, Zap, Clock, ShieldAlert,
@@ -11,6 +12,7 @@ import { markPlayRun } from "@/lib/favorites";
 import StarToggle from "@/components/StarToggle";
 import ResponsiveDetailPanel from "@/components/ResponsiveDetailPanel";
 import ReportAccessButton from "@/components/ReportAccessButton";
+import { communitiesForPlay, playHref } from "@/lib/communityGraph";
 
 // ─── The five anatomy segments, color-coded from the app's own tokens ─────────
 // (Not the mockup's raw hexes — these are the existing #003087 / tech / caution /
@@ -80,7 +82,9 @@ function Segment({
   );
 }
 
-export default function PlayCard2({ play }: { play: ContentItem }) {
+// `communityId` is the community the card is shown in. Plays open inside a community, so saved
+// items and report links point back to it, and the card lists every other community it is in.
+export default function PlayCard2({ play, communityId }: { play: ContentItem; communityId?: string }) {
   const [expanded, setExpanded] = useState(false);
   const [values, setValues] = useState<Record<string, string>>({});
   const [assembled, setAssembled] = useState<string | null>(null);
@@ -105,9 +109,11 @@ export default function PlayCard2({ play }: { play: ContentItem }) {
   };
 
   const runOn = play.run_on;
+  const playUrl = playHref(play.id, communityId);
+  const otherCommunities = communitiesForPlay(play.id).filter((community) => community.id !== communityId);
 
   return (
-    // id anchor: tool cards deep-link here as /plays#<playId>
+    // id anchor: search results and tool cards deep-link here as /communities/<id>#<playId>
     <div id={play.id} className="scroll-mt-4 rounded-card shadow-resting overflow-hidden bg-white border border-silver-mid/50 transition-all duration-base ease-smooth hover:shadow-hover hover:border-primary/25">
       {/* ── Collapsed header ── */}
       <div className="flex items-start gap-2 p-4">
@@ -138,7 +144,7 @@ export default function PlayCard2({ play }: { play: ContentItem }) {
         </button>
 
         <div className="flex items-center gap-0.5 flex-shrink-0 -mr-1.5">
-          <StarToggle item={{ type: "play", id: play.id, title: play.title, url: "/plays" }} />
+          <StarToggle item={{ type: "play", id: play.id, title: play.title, url: playUrl }} />
           <button
             onClick={() => setExpanded((e) => !e)}
             aria-label={expanded ? "Collapse play" : "Expand play"}
@@ -152,6 +158,21 @@ export default function PlayCard2({ play }: { play: ContentItem }) {
           </button>
         </div>
       </div>
+
+      {otherCommunities.length > 0 && (
+        <p className="flex flex-wrap items-center gap-1.5 px-4 pb-3 text-[10px] font-bold uppercase tracking-wider text-silver">
+          <span>{communityId ? "Also in" : "In"}</span>
+          {otherCommunities.map((community) => (
+            <Link
+              key={community.id}
+              href={`/communities/${community.id}#${play.id}`}
+              className="rounded-badge border border-primary/30 px-2 py-1 text-[10px] font-semibold normal-case tracking-normal text-primary hover:bg-primary-ghost"
+            >
+              {community.name}
+            </Link>
+          ))}
+        </p>
+      )}
 
       {/* ── Expanded body ── */}
       {expanded && seg && (
@@ -240,7 +261,7 @@ export default function PlayCard2({ play }: { play: ContentItem }) {
           </div>
 
           <div className="mt-4 flex justify-end border-t border-silver-mid/50 pt-2">
-            <ReportAccessButton targetType="play" targetId={play.id} targetTitle={play.title} targetUrl={`/plays#${play.id}`} />
+            <ReportAccessButton targetType="play" targetId={play.id} targetTitle={play.title} targetUrl={playUrl} />
           </div>
 
           {/* 4 · See the whole play → assemble verbatim + copy */}

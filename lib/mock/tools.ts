@@ -24,14 +24,14 @@ export interface FirstMove {
 }
 
 export interface ChangedNote {
-  date: string; // ISO — a dot renders on the row while this is within 60 days
+  date: string; // ISO — a dated change notice is shown for 60 days
   text: string;
 }
 
 export interface Tool {
   id: string;
   name: string;
-  one_liner: string;             // expanded-header line (collapsed rows carry no description)
+  one_liner: string;             // short capability summary shown on cards and in details
   description: string;           // what it is, 1–3 sentences
   section: Section;
   badge?: string;

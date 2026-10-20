@@ -8,7 +8,8 @@ import {
   Timer, Stethoscope, ClipboardCheck, MessagesSquare, Award, MonitorPlay,
 } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
-import { PRODUCT_NAME } from "@/lib/branding";
+import PageHero from "@/components/PageHero";
+import { playHref } from "@/lib/communityGraph";
 
 // ─── Progressive-disclosure accordion — depth never reads heavy ─────────────────
 function Accordion({
@@ -154,25 +155,14 @@ const LEVELS = [
 
 export default function AIAutomationPage() {
   return (
-    <div className="flex flex-col">
-      {/* Header + thesis */}
-      <div className="hero-af text-white px-5 pt-5 pb-6 overflow-hidden rounded-b-[24px]">
-        <div className="flex items-center gap-3 mb-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/assets/af-symbol-white.svg" alt="U.S. Air Force" className="h-6 flex-shrink-0" draggable={false} />
-          <div className="w-px h-5 bg-silver/40 flex-shrink-0" aria-hidden="true" />
-          <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">{PRODUCT_NAME}</span>
-        </div>
-        <h1 className="font-display text-2xl font-bold uppercase tracking-wider mb-3">AI &amp; Automation</h1>
-        {/* Thesis — verbatim (Doctrine §4) */}
-        <div className="rounded-card bg-white/10 border border-white/20 px-4 py-3">
-          <p className="text-base font-semibold leading-snug text-white">
+    <div className="editorial-page bleed flex flex-col">
+      <PageHero eyebrow="The field guide" title="AI & Automation" photo="c17-dusk" position="50% 60%">
+          <p>
             AI is the instrument. The workflow is the music. You are the orchestrator.
           </p>
-        </div>
-      </div>
+      </PageHero>
 
-      <div className="px-4 pt-5 flex flex-col gap-6 pb-6">
+      <div className="pt-5 flex flex-col gap-6 pb-6">
         {/* Intro */}
         {/* FLAGGED: confirm the survey source with Mike before coordination; softened for now. */}
         <p className="text-xs text-gray-500 leading-relaxed">
@@ -400,7 +390,7 @@ export default function AIAutomationPage() {
                         </a>
                       )}
                       {n === 3 && (
-                        <Link href="/plays" className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary mt-1.5">
+                        <Link href={playHref("process-map-constraint")} className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary mt-1.5">
                           Run the Improve the Process plays <ArrowUpRight size={11} />
                         </Link>
                       )}

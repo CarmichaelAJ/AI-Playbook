@@ -86,7 +86,7 @@ export function useOnboarding(): {
 }
 
 export const INTENT_COPY: Record<OnboardingIntent, { label: string; line: string; href: string }> = {
-  execute: { label: "Execute a task", line: "Start with a play and run it in an approved tool.", href: "/plays" },
+  execute: { label: "Execute a task", line: "Start with a play in your community and run it in an approved tool.", href: "/communities" },
   tool: { label: "Find a tool", line: "Open the approved door and follow the access path.", href: "/tools" },
   learn: { label: "Learn the system", line: "Get oriented before choosing chat, agents, automation, or process work.", href: "/ai-automation" },
   hq: { label: "Set up Home", line: "Use your shelf, launchpads, and official sources first.", href: "/" },

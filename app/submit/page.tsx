@@ -194,7 +194,7 @@ export default function SubmitPage() {
               ))}
             </div>
           )}
-          <Link href="/plays" className="mt-4 inline-flex text-xs font-bold text-primary">Back to community feeds</Link>
+          <Link href="/communities" className="mt-4 inline-flex text-xs font-bold text-primary">Back to community feeds</Link>
         </aside>
       </div>
     </div>

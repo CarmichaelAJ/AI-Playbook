@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { LogOut, ShieldCheck, UserRound, X } from "lucide-react";
+import { LogOut, ShieldCheck, X } from "lucide-react";
 import { APP_MODE } from "@/lib/features";
 import { syncPlatformProfile } from "@/lib/platformApi";
 import {
@@ -81,15 +81,6 @@ export default function PlatformAccount() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="fixed right-3 top-9 z-40 flex h-9 max-w-[150px] items-center gap-1.5 rounded-inner border border-silver-mid/70 bg-white px-2.5 text-xs font-bold text-primary-dark shadow-resting transition-colors hover:border-primary/40 hover:bg-primary-ghost"
-      >
-        <UserRound size={15} className="flex-shrink-0 text-primary" />
-        <span className="truncate">{identity ? `@${identity.username}` : "Simulated sign-in"}</span>
-      </button>
-
       {open && (
         <div className="fixed inset-0 z-[90] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Platform account">
           <button type="button" aria-label="Close account" onClick={() => setOpen(false)} className="absolute inset-0 bg-primary-deeper/55 backdrop-blur-[2px]" />
