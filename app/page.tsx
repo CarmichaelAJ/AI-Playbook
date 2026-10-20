@@ -1,237 +1,314 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, BookOpen, Search } from "lucide-react";
+import {
+  ArrowRight, Layers, Wrench, GraduationCap,
+  Zap, Repeat, TrendingUp, ShieldCheck, Lightbulb, ExternalLink, BookOpen, Search,
+} from "lucide-react";
+import ScrollReveal from "@/components/ScrollReveal";
 import { LEARNING_PATHS } from "@/content/learningPaths";
 import { FEATURES } from "@/lib/features";
 import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
 import HomeSections from "@/components/HomeSections";
-import HomeHero from "@/components/HomeHero";
-import { Photo, PhotoCredit } from "@/components/Photograph";
-import { PHOTOGRAPHS } from "@/content/photography";
-import styles from "./home.module.css";
 
+// ─── Where do you want to start? — the intent doors (route by intent, not device) ─
 const paths = [
   {
-    href: "/communities",
+    href: "/plays",
+    icon: Layers,
     title: "Execute a task",
-    label: "Plays, in communities",
-    body: "Open your community and get the safe starting move for the situation in front of you. Fill it in, run it, and check it before your name goes on it.",
+    body: "Get the safe starting move for the situation in front of you. Every play shows its moving parts — fill it in, run it, and check it before your name goes on it.",
   },
   {
     href: "/tools",
-    title: "Find the right tool",
-    label: "The tool directory",
-    body: "Find an approved AI, automation, or data tool. See what it is cleared for and follow the full access path.",
+    icon: Wrench,
+    title: "Find tools & data",
+    body: "Browse the approved AI, automation, and data tools — from GenAI.mil to SharePoint — with the full access path to get in. If it's listed, it's approved.",
   },
   {
     href: "/ai-automation",
-    title: "Choose your approach",
-    label: "The field guide",
-    body: "Chat, agent, automation, or fix the process first. Make the call, then go as deep as you have time for.",
+    icon: GraduationCap,
+    title: "Decide how to attack it",
+    body: "Twenty seconds to the right move — chat session, agent, automation, or fix the process first. Then go as deep as you have time for.",
   },
 ];
 
+// ─── The Three Levels of Engagement — the depth ladder, before you open a play ───
 const levels = [
-  { title: "Execute", body: "Team with AI to finish today's task faster. One play, one prompt, minutes back." },
-  { title: "Systematize", body: "The task repeats? Build a reusable agent with saved context and templates, so the result is consistent every time." },
-  { title: "Improve & optimize", body: "Question the process itself. Map the flow, find the waste, and build the case to make it better." },
+  {
+    n: 1,
+    icon: Zap,
+    title: "Execute",
+    body: "Team with AI to finish today's task faster. One play, one prompt, minutes back.",
+  },
+  {
+    n: 2,
+    icon: Repeat,
+    title: "Systematize",
+    body: "The task repeats? Build a reusable agent with saved context and templates, so the result is consistent every time.",
+  },
+  {
+    n: 3,
+    icon: TrendingUp,
+    title: "Improve & Optimize",
+    body: "Question the process itself. Map the flow, find the waste, and build the case to make it better.",
+  },
 ];
+
+function openGuide() {
+  window.dispatchEvent(new Event("ap:open-guide"));
+}
+
+// Shared eyebrow label for each front-door section.
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">{children}</p>;
+}
 
 export default function HomePage() {
   return (
-    <div className={`${styles.home} bleed`}>
-      <HomeHero />
-
-      <section className={`${styles.band} ${styles.statement}`} aria-labelledby="statement-title">
-        <div className={`${styles.inner} ${styles.statementGrid}`}>
-          <div className={`${styles.statementCopy} rise`}>
-            <p className={styles.eyebrow}>The Playbook</p>
-            <h2 id="statement-title" className={styles.monument}>
-              Leadership has set the direction. <em>This is where Airmen act on it.</em>
-            </h2>
-            <p className={styles.lede}>
-              The Department of the Air Force has called for an AI-first force. This is the practical response:
-              approved tools, ready plays, and the guidance to use them well, in the work already in front of you.
-            </p>
-            <Link href="/communities" className={styles.solidLink}>Browse communities <ArrowRight size={18} aria-hidden="true" /></Link>
+    <div className="flex flex-col">
+      {/* ── Hero: what this is (mission statement) + the User Guide door ── */}
+      <div className="relative hero-af text-white px-5 pt-8 pb-10 overflow-hidden rounded-b-[24px]">
+        <div className="relative z-10 flex flex-col items-center text-center">
+          {/* AF Symbol — authorized white version */}
+          <div className="mb-5 mt-1">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/af-symbol-white.svg" alt="U.S. Air Force" className="h-16 mx-auto" draggable={false} />
           </div>
-          <figure className={`${styles.plate} rise`}>
-            <div className={`${styles.frame} ${styles.frameTall}`}>
-              <Photo id="academy-chapel" sizes="(min-width: 64rem) 40vw, 90vw" className={`${styles.frameImage} drift`} />
-            </div>
-            <figcaption>
-              <span className={styles.plateLabel}>Plate I</span>
-              {PHOTOGRAPHS["academy-chapel"].caption}
-              <PhotoCredit id="academy-chapel" className={styles.credit} />
-            </figcaption>
-          </figure>
-        </div>
-      </section>
 
-      <section className={`${styles.dark} ${styles.direction}`} aria-labelledby="direction-title" data-tone="dark">
-        <div className={styles.stage}>
-          <div className={styles.backdrop} aria-hidden="true">
-            <Photo id="hangar-t6" decorative sizes="100vw" className={`${styles.backdropImage} drift`} />
-          </div>
-          <div className={styles.shade} aria-hidden="true" />
-          <div className={`${styles.inner} ${styles.stageInner} rise`}>
-            <p className={styles.eyebrow}>02 / Institutional direction</p>
-            <h2 id="direction-title" className={styles.monument}>An AI-first force.<br />A practical next step.</h2>
-          </div>
-          <PhotoCredit id="hangar-t6" className={styles.sectionCredit} />
-        </div>
-        <div className={styles.quoteBand}>
-          <div className={`${styles.inner} ${styles.quoteGrid} rise`}>
-            <blockquote cite="https://www.af.mil/Portals/1/documents/2026SAF/DAF_AI_Strategy.pdf">
-              <p>“We will move with urgency from a posture of deliberate experimentation to one of enterprise-wide operationalization.”</p>
-            </blockquote>
-            <div className={styles.strategyMeta}>
-              <p className={styles.attribution}>
-                Troy E. Meink <span>Secretary of the Air Force</span>
-              </p>
-              <p className={styles.sourceNote}>DAF Artificial Intelligence Strategy, foreword · Released April 2026</p>
-              <Link href="/reader/daf-ai-strategy" className={styles.textLink}>Read the strategy <ArrowUpRight size={16} aria-hidden="true" /></Link>
-              <p className={styles.interpretation}>
-                The strategy sets the direction. This Playbook is a practical response: a place to learn the approach,
-                find an approved tool, and apply it to the work in front of you.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+          <div className="w-12 h-px bg-warm mb-5" aria-hidden="true" />
 
-      <section id="start-here" className={`${styles.band} ${styles.paper} ${styles.adoption}`} aria-labelledby="execution-title">
-        <div className={`${styles.inner} ${styles.adoptionGrid}`}>
-          <figure className={`${styles.plate} ${styles.featurePlate} rise`}>
-            <div className={`${styles.frame} ${styles.frameWide}`}>
-              <Photo id="airman-laptop" sizes="(min-width: 64rem) 55vw, 92vw" className={`${styles.frameImage} drift`} />
-            </div>
-            <figcaption>
-              <span className={styles.plateLabel}>Plate II</span>
-              {PHOTOGRAPHS["airman-laptop"].caption}
-              <PhotoCredit id="airman-laptop" className={styles.credit} />
-            </figcaption>
-          </figure>
-          <div className={`${styles.adoptionCopy} rise`}>
-            <p className={styles.eyebrow}>03 / Airman adoption</p>
-            <h2 id="execution-title" className={styles.monument}>Put direction into practice.</h2>
-            <button type="button" className={styles.textLink} onClick={() => window.dispatchEvent(new Event("ap:open-guide"))}>
-              <BookOpen size={16} aria-hidden="true" /> Read the user guide
-            </button>
-            <div className={styles.actionColumns}>
-              {paths.map(({ href, title, label, body }, index) => (
-                <Link href={href} key={href} className={styles.action}>
-                  <span className={styles.actionNumeral} aria-hidden="true">0{index + 1}</span>
-                  <span className={styles.actionText}>
-                    <span className={styles.eyebrow}>{label}</span>
-                    <strong>{title}</strong>
-                    <span className={styles.actionBody}>{body}</span>
-                  </span>
-                  <ArrowUpRight size={22} aria-hidden="true" className={styles.actionArrow} />
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+          <h1 className="font-display text-4xl font-black uppercase tracking-wider leading-tight mb-2">
+            Airman&apos;s<br />AI Playbook
+          </h1>
 
-      {FEATURES.staticSearch && (
-        <section className={`${styles.band} ${styles.stone2} ${styles.find}`} aria-label="Search the Playbook">
-          <form action="/search" className={`${styles.inner} ${styles.search}`}>
-            <label htmlFor="home-search">Have a task in mind?</label>
-            <div className={styles.searchInput}>
-              <Search size={22} aria-hidden="true" />
-              <input id="home-search" name="q" type="search" placeholder="Search tasks, tools, AFSCs, sources..." autoComplete="off" />
-              <button type="submit">Search <ArrowRight size={17} aria-hidden="true" /></button>
-            </div>
-            <div className={styles.searchShortcuts} aria-label="Suggested searches">
-              <span>Start with</span>
-              {[
-                ["2A6X1", "/search?q=2A6X1"],
-                ["EPB", "/search?q=EPB"],
-                ["UDM", "/search?q=UDM"],
-                ["MFR", "/search?q=MFR"],
-                ["Tools", "/search?kind=tool"],
-                ...(FEATURES.communities ? [["Communities", "/search?kind=community"]] : []),
-              ].map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}
-            </div>
-          </form>
-        </section>
-      )}
+          {/* FLAGGED: "Built for Airmen, by Airmen" tagline pending product-owner adjudication (Doctrine appendix) */}
+          <p className="text-caption font-bold uppercase tracking-widest text-warm mb-4">
+            Built for Airmen, by Airmen
+          </p>
 
-      <section className={`${styles.dark} ${styles.engagement}`} aria-labelledby="engagement-title" data-tone="dark">
-        <figure className={styles.splitPhoto}>
-          <Photo id="b2-night" sizes="(min-width: 64rem) 55vw, 100vw" className={`${styles.splitImage} drift`} />
-          <figcaption>
-            <span className={styles.plateLabel}>Plate III</span>
-            {PHOTOGRAPHS["b2-night"].caption}
-            <PhotoCredit id="b2-night" className={styles.credit} />
-          </figcaption>
-        </figure>
-        <div className={`${styles.splitText} rise`}>
-          <p className={styles.eyebrow}>04 / Mission execution</p>
-          <h2 id="engagement-title" className={styles.monument}>Start with today.<br />Build for what&apos;s next.</h2>
-          <div className={styles.engagementAside}>
-            <p>You choose how deep to go. Every play runs today at Level 1.</p>
-            <Link href="/ai-automation" className={styles.textLink}>Explore AI &amp; automation <ArrowRight size={16} aria-hidden="true" /></Link>
-          </div>
-          <ol className={styles.levels}>
-            {levels.map(({ title, body }, index) => (
-              <li key={title}>
-                <span className={styles.levelNumber} aria-hidden="true">0{index + 1}</span>
-                <div><h3>{title}</h3><p>{body}</p></div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+          <p className="text-base text-white font-semibold leading-snug max-w-[22rem]">
+            Your front door to AI at work. Find the move for your situation, the right approved tool,
+            and the safe way to run it.
+          </p>
 
-      {FEATURES.learningPaths && (
-        <section className={`${styles.band} ${styles.paper} ${styles.learning}`} aria-labelledby="learning-title">
-          <div className={styles.inner}>
-            <header className={`${styles.sectionHeading} rise`}>
-              <div>
-                <p className={styles.eyebrow}>In your field</p>
-                <h2 id="learning-title" className={styles.monument}>Make it useful to your work.</h2>
-              </div>
-              {FEATURES.communities && <Link href="/communities" className={styles.textLink}>See all communities <ArrowRight size={16} aria-hidden="true" /></Link>}
-            </header>
-            <div className={styles.learningRows}>
-              {LEARNING_PATHS.map((path) => (
-                <Link key={path.id} href={path.href} className={styles.learningRow}>
-                  <div><p className={styles.eyebrow}>{path.audience}</p><h3>{path.label}</h3></div>
-                  <div>
-                    <p>{path.focus}</p>
-                    <p className={styles.firstMoves}>{path.tags.join(" / ")}</p>
-                    <p className={styles.firstMoves}><strong>First moves</strong> {path.steps.join(" · ")}</p>
-                  </div>
-                  <ArrowUpRight size={22} aria-hidden="true" />
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      <div className={`${styles.band} ${styles.referenceBand}`}>
-        <div className={styles.inner}>
-          <HomeSections />
+          {/* How do I use it — one clearly visible User Guide door (first-visit value, no repeat tax) */}
+          <button
+            onClick={openGuide}
+            className="mt-6 inline-flex items-center gap-2 rounded-badge border border-white/40 bg-white/10 px-4 py-2 text-sm font-bold text-white hover:bg-white/20 transition-colors"
+          >
+            <BookOpen size={15} /> User Guide
+          </button>
         </div>
       </div>
 
-      <section className={`${styles.band} ${styles.stone2} ${styles.responsibility}`} aria-labelledby="responsibility-title">
-        <div className={`${styles.inner} rise`}>
-          <p className={styles.eyebrow}>The responsibility stays with you</p>
-          <h2 id="responsibility-title" className={styles.monument}>Use the tool. Own the result.</h2>
-          <p className={styles.lede}>Use approved tools. Never enter classified information, and follow your local guidance on CUI and PII.
-            Check every output before it becomes official work.</p>
-          <div className={styles.closingLinks}>
-            <Link href="/tools" className={styles.textLink}>Check tool guidance <ArrowRight size={16} aria-hidden="true" /></Link>
-            {SUGGEST_PLAY_FORM_URL && <a href={SUGGEST_PLAY_FORM_URL} target="_blank" rel="noopener noreferrer" className={styles.textLink}>Suggest a play <ArrowUpRight size={16} aria-hidden="true" /></a>}
+      {/* ── Front-door content — one rhythm for every section ── */}
+      <div className="px-4 pt-5 pb-8 flex flex-col gap-7">
+        <section>
+          <ScrollReveal>
+            <form action="/search" className="p-3 rounded-card bg-white border border-silver-mid/40 shadow-resting">
+              <label className="flex items-center gap-2 rounded-inner bg-silver-tint px-3 py-2">
+                <Search size={18} className="text-primary flex-shrink-0" />
+                <span className="sr-only">Search the AI Playbook</span>
+                <input
+                  name="q"
+                  placeholder="Search tasks, tools, AFSCs, sources..."
+                  className="w-full bg-transparent text-sm font-semibold text-primary-dark placeholder:text-gray-400 outline-none"
+                  autoComplete="off"
+                />
+                <button
+                  type="submit"
+                  className="flex-shrink-0 rounded-badge bg-primary px-3 py-1.5 text-[11px] font-bold text-white"
+                >
+                  Search
+                </button>
+              </label>
+              <div className="mt-2 flex gap-1.5 overflow-x-auto px-1 pb-1">
+                {[
+                  ["2A", "2A"],
+                  ["Awards", "awards"],
+                  ["MFR", "MFR"],
+                  ["Tools", "kind=tool"],
+                  ["Communities", "kind=community"],
+                ].map(([label, value]) => (
+                  <Link
+                    key={label}
+                    href={value.startsWith("kind=") ? `/search?${value}` : `/search?q=${encodeURIComponent(value)}`}
+                    className="flex-shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-badge bg-primary-ghost text-primary"
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            </form>
+          </ScrollReveal>
+        </section>
+
+        {/* Where do you want to start? — the intent doors */}
+        <section>
+          <ScrollReveal>
+            <SectionLabel>Where do you want to start?</SectionLabel>
+          </ScrollReveal>
+          <div className="grid gap-3 md:grid-cols-3">
+            {paths.map(({ href, icon: Icon, title, body }) => (
+              <ScrollReveal key={href}>
+                <Link
+                  href={href}
+                  className="flex md:flex-col items-center md:items-start gap-3 h-full p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting transition-[transform,border-color,box-shadow] hover:border-primary/30 hover:shadow-raised active:scale-[0.99]"
+                >
+                  <div className="w-9 h-9 rounded-inner flex items-center justify-center flex-shrink-0 bg-primary/10">
+                    <Icon size={18} className="text-primary" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold leading-tight text-primary-dark">{title}</p>
+                    <p className="text-xs leading-snug mt-0.5 text-gray-500">{body}</p>
+                  </div>
+                  <ArrowRight size={16} className="flex-shrink-0 md:hidden text-silver" />
+                </Link>
+              </ScrollReveal>
+            ))}
           </div>
-        </div>
-      </section>
+        </section>
+
+        <HomeSections />
+
+        {FEATURES.learningPaths && (
+          <section>
+            <ScrollReveal>
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <SectionLabel>Learn what fits your work</SectionLabel>
+                <Link href="/communities" className="text-[11px] font-bold text-primary underline underline-offset-2">
+                  See all
+                </Link>
+              </div>
+            </ScrollReveal>
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              {LEARNING_PATHS.map((path) => (
+                <ScrollReveal key={path.id}>
+                  <Link href={path.href} className="flex flex-col h-full p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting active:scale-[0.99] transition-transform">
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-inner bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <GraduationCap size={18} className="text-primary" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-silver">{path.audience}</p>
+                        <h2 className="text-sm font-bold text-primary-dark leading-tight mt-0.5">{path.label}</h2>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-600 leading-snug mt-3">{path.focus}</p>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {path.tags.slice(0, 4).map((tag) => (
+                        <span key={tag} className="text-[10px] font-semibold px-2 py-0.5 rounded-badge bg-primary-ghost text-primary">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-silver-mid/30">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-silver mb-1">First moves</p>
+                      <p className="text-xs text-gray-500 leading-snug">{path.steps.join(", ")}</p>
+                    </div>
+                  </Link>
+                </ScrollReveal>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Three Levels of Engagement — the depth ladder exists before you open a play */}
+        <section>
+          <ScrollReveal>
+            <SectionLabel>How deep do you want to go?</SectionLabel>
+          </ScrollReveal>
+          <div className="grid gap-3 md:grid-cols-3">
+            {levels.map(({ n, icon: Icon, title, body }) => (
+              <ScrollReveal key={n}>
+                <div className="flex md:flex-col gap-3 h-full p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting">
+                  <div className="flex-shrink-0">
+                    <div className="w-9 h-9 rounded-inner bg-primary/10 flex items-center justify-center relative">
+                      <Icon size={18} className="text-primary" />
+                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-primary text-white text-[9px] font-bold flex items-center justify-center">
+                        {n}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-silver leading-none">Level {n}</p>
+                    <h2 className="text-sm font-bold text-primary-dark mt-0.5">{title}</h2>
+                    <p className="text-xs text-gray-500 mt-0.5 leading-snug">{body}</p>
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+          <ScrollReveal>
+            <p className="text-[11px] text-gray-500 mt-2 leading-snug">
+              You choose how deep to go — every play runs today at Level 1. See the depth ladder in{" "}
+              <Link href="/ai-automation" className="text-primary font-semibold underline underline-offset-2">AI &amp; Automation</Link>.
+            </p>
+          </ScrollReveal>
+        </section>
+
+        {/* Built to be safe by design — security reframed as a trust signal */}
+        {/* FLAGGED: safety-by-design block wording pending product-owner adjudication (Doctrine appendix).
+            Underlying posture (no CUI/PII/classified, local-only, check your output) is consistent with intent;
+            the phrasing — including "verify every output before official use" — is unratified. Left verbatim. */}
+        <section>
+          <ScrollReveal>
+            <SectionLabel>Built to be safe by design</SectionLabel>
+          </ScrollReveal>
+          <ScrollReveal>
+            <div className="flex gap-3 p-4 rounded-card bg-warm/10 border border-warm/30">
+              <div className="w-9 h-9 rounded-inner bg-warm/20 flex items-center justify-center flex-shrink-0">
+                <ShieldCheck size={18} className="text-caution" />
+              </div>
+              <p className="text-xs text-primary-dark leading-relaxed">
+                Nothing you type is sent, stored, or generated here. The app points you to approved tools and
+                reminds you never to paste classified, CUI, or PII — and to verify every output before official use.
+              </p>
+            </div>
+          </ScrollReveal>
+        </section>
+
+        {/* Suggest a play — SME contribution door */}
+        {/* FLAGGED: suggest-a-play mechanism endorsed in spirit; placement + wording unratified (Doctrine appendix). */}
+        <section>
+          <ScrollReveal>
+            <SectionLabel>Help build the AI Playbook</SectionLabel>
+          </ScrollReveal>
+          <ScrollReveal>
+            {SUGGEST_PLAY_FORM_URL ? (
+              <a
+                href={SUGGEST_PLAY_FORM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 rounded-card bg-primary text-white shadow-resting active:scale-[0.99] transition-transform"
+              >
+                <div className="w-9 h-9 rounded-inner bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <Lightbulb size={18} className="text-warm" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold leading-tight">Suggest a play</p>
+                  <p className="text-xs text-on-dark leading-snug">Know a task AI could speed up? Propose it for the shelf.</p>
+                </div>
+                <ExternalLink size={16} className="flex-shrink-0 text-white/70" />
+              </a>
+            ) : (
+              <div className="flex items-center gap-3 p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting">
+                <div className="w-9 h-9 rounded-inner bg-silver-tint flex items-center justify-center flex-shrink-0">
+                  <Lightbulb size={18} className="text-silver" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-primary-dark leading-tight">Suggest a play</p>
+                  <p className="text-xs text-gray-500 leading-snug">Contribution form opening soon.</p>
+                </div>
+                <span className="text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-badge bg-gray-100 text-gray-500 flex-shrink-0">
+                  Coming soon
+                </span>
+              </div>
+            )}
+          </ScrollReveal>
+        </section>
+      </div>
     </div>
   );
 }

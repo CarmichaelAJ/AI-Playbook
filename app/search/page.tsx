@@ -5,9 +5,9 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, BookOpen, Filter, GraduationCap, Layers, Search, Users, Wrench } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import { FEATURES } from "@/lib/features";
-import PageHero from "@/components/PageHero";
+import { PRODUCT_NAME } from "@/lib/branding";
 import { searchCommunityContent, trackAnalyticsEvent, type CommunitySubmission } from "@/lib/platformApi";
-import { SEARCH_KINDS, COMMUNITIES, searchItems, type SearchKind, type SearchItem } from "@/lib/search";
+import { SEARCH_KINDS, SOURCE_COMMUNITIES, searchItems, type SearchKind, type SearchItem } from "@/lib/search";
 
 const KIND_ICON: Record<SearchKind, typeof Layers> = {
   play: Layers,
@@ -17,45 +17,22 @@ const KIND_ICON: Record<SearchKind, typeof Layers> = {
   learning: GraduationCap,
 };
 
-// The card is one block with a "stretched" title link. Community chips are separate links
-// that sit above it, so a play result can show and open every community it belongs to
-// without nesting one link inside another.
 function ResultCard({ item }: { item: SearchItem }) {
   const Icon = KIND_ICON[item.kind];
   const external = item.url.startsWith("http");
-  const linkClass = "after:absolute after:inset-0 after:content-['']";
-  const title = <h2 className="text-sm font-bold text-primary-dark leading-tight mt-0.5">{item.title}</h2>;
-  return (
-    <div className="relative p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting h-full">
+  const body = (
+    <div className="p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting h-full">
       <div className="flex items-start gap-3">
         <div className="w-9 h-9 rounded-inner bg-primary/10 flex items-center justify-center flex-shrink-0">
           <Icon size={17} className="text-primary" />
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-[10px] font-bold uppercase tracking-wider text-silver">{item.kind}</p>
-          {external ? (
-            <a href={item.url} target="_blank" rel="noopener noreferrer" className={linkClass}>{title}</a>
-          ) : (
-            <Link href={item.url} className={linkClass}>{title}</Link>
-          )}
+          <h2 className="text-sm font-bold text-primary-dark leading-tight mt-0.5">{item.title}</h2>
           <p className="text-xs text-gray-600 leading-snug mt-1">{item.description}</p>
         </div>
-        <ArrowRight size={15} className="text-silver flex-shrink-0 mt-1" aria-hidden="true" />
+        <ArrowRight size={15} className="text-silver flex-shrink-0 mt-1" />
       </div>
-      {item.communities && item.communities.length > 0 && (
-        <p className="relative mt-3 flex flex-wrap items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-silver">
-          <span>In</span>
-          {item.communities.map((community) => (
-            <Link
-              key={community.id}
-              href={`/communities/${community.id}`}
-              className="rounded-badge border border-primary/30 bg-white px-2 py-1 text-[10px] font-semibold normal-case tracking-normal text-primary hover:bg-primary-ghost"
-            >
-              {community.name}
-            </Link>
-          ))}
-        </p>
-      )}
       <div className="flex gap-1.5 flex-wrap mt-3">
         {item.tags.slice(0, 6).map((tag) => (
           <span key={tag} className="text-[10px] font-semibold px-2 py-0.5 rounded-badge bg-primary-ghost text-primary">
@@ -64,6 +41,12 @@ function ResultCard({ item }: { item: SearchItem }) {
         ))}
       </div>
     </div>
+  );
+
+  return external ? (
+    <a href={item.url} target="_blank" rel="noopener noreferrer">{body}</a>
+  ) : (
+    <Link href={item.url}>{body}</Link>
   );
 }
 
@@ -128,7 +111,7 @@ export default function SearchPage() {
       }));
     return [...platformResults, ...staticResults].slice(0, 40);
   }, [community, communityResults, kind, query]);
-  const starter = "Try: awards, MFR, EPB, UDM, 2A6X1, dashboard, CUI, GenAI, process map, commander";
+  const starter = "Try: awards, MFR, 2A, dashboard, CUI, GenAI, process map, commander, cyber";
 
   useEffect(() => {
     if (!FEATURES.analytics || query.trim().length < 2 || results.length > 0) return;
@@ -150,14 +133,21 @@ export default function SearchPage() {
   }
 
   return (
-    <div className="editorial-page bleed flex flex-col">
-      <PageHero eyebrow="The working reference" title="Search">
-        <p>
-          Find approved tools, official sources, communities, and the plays inside them from one box.
+    <div className="flex flex-col">
+      <div className="hero-af text-white px-5 pt-5 pb-5 overflow-hidden rounded-b-[24px]">
+        <div className="flex items-center gap-3 mb-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/assets/af-symbol-white.svg" alt="U.S. Air Force" className="h-6 flex-shrink-0" draggable={false} />
+          <div className="w-px h-5 bg-silver/40 flex-shrink-0" aria-hidden="true" />
+          <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">{PRODUCT_NAME}</span>
+        </div>
+        <h1 className="font-display text-2xl font-bold uppercase tracking-wider mb-1">Search</h1>
+        <p className="text-sm text-on-dark">
+          Find plays, approved tools, official sources, and source communities from one box.
         </p>
-      </PageHero>
+      </div>
 
-      <div className="pt-5 flex flex-col gap-4 pb-6">
+      <div className="px-4 pt-5 flex flex-col gap-4 pb-6">
         <ScrollReveal>
           <div className="p-3 rounded-card bg-white border border-silver-mid/40 shadow-resting">
             <label className="flex items-center gap-2 rounded-inner bg-silver-tint px-3 py-2">
@@ -204,7 +194,7 @@ export default function SearchPage() {
                 aria-label="Filter by source community"
               >
                 <option value="all">All source communities</option>
-                {COMMUNITIES.map((c) => (
+                {SOURCE_COMMUNITIES.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>

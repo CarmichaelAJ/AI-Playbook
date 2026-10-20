@@ -40,7 +40,7 @@ export const FEATURE_REGISTRY = {
     requiresAuth: false,
     requiresDatabase: false,
     dataLevel: "public",
-    staticFallback: "Plays are only reachable inside communities, so do not turn this off without another way to browse them.",
+    staticFallback: "Remove AFSC/community sourcing pages from navigation and search.",
   },
   learningPaths: {
     label: "AFSC learning paths",

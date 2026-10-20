@@ -1,5 +1,5 @@
-const CACHE_NAME = "airmans-ai-playbook-static-v2";
-const CORE = ["/", "/tools", "/communities", "/ai-automation", "/learn", "/search", "/manifest.webmanifest"];
+const CACHE_NAME = "airmans-ai-playbook-static-v1";
+const CORE = ["/", "/plays", "/tools", "/communities", "/ai-automation", "/learn", "/search", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE)));

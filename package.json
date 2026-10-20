@@ -13,8 +13,6 @@
     "lint": "eslint",
     "lint:lexicon": "node scripts/lint-lexicon.mjs",
     "test:verbatim": "node scripts/test-verbatim.mjs",
-    "test:ui": "playwright test tests/ui",
-    "test:unit": "playwright test tests/unit",
     "check:links": "node scripts/check-links.mjs",
     "api:build": "npm --prefix services/api run build",
     "api:dev": "npm --prefix services/api run dev",
@@ -32,8 +30,6 @@
     "sharp": "0.35.3"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.13.0",
-    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
