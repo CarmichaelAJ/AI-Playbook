@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { FEATURES } from "@/lib/features";
 import { Photo, PhotoCredit } from "@/components/Photograph";
+import LeadershipLetter from "@/components/LeadershipLetter";
+import { LEADERSHIP_LETTER } from "@/content/leadershipLetter";
 import styles from "./HomeHero.module.css";
 
 // Every action is a real route. None of them scroll to a section of this page.
@@ -42,6 +44,7 @@ export default function HomeHero() {
           <p className={styles.eyebrow}>The Playbook</p>
           <h1 id="playbook-title" className={styles.wordmark}>Airman&apos;s <span>AI Playbook</span></h1>
           <p className={styles.lede}>Find your community, the play for the task in front of you, or an approved tool.</p>
+          <LeadershipLetter letter={LEADERSHIP_LETTER} />
         </div>
 
         <nav aria-label="Start here" className={styles.actions}>

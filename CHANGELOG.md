@@ -3,18 +3,19 @@
 ## [Unreleased] — Navigation, communities, and memorandum rework
 
 ### Added
+- A quiet link beneath the hero title to the Chief of Staff's first letter to the force (3 Nov 2025), with the signature and a signed PDF that opens in the same tab ([components/LeadershipLetter.tsx](components/LeadershipLetter.tsx), [content/leadershipLetter.ts](content/leadershipLetter.ts)). Signature use approved by the product owner.
 - Header with the Air Force symbol (`public/assets/af-symbol-white.svg`), direct Search and Sign in, and a hamburger side menu that works by keyboard and pointer ([components/SiteHeader.tsx](components/SiteHeader.tsx)).
 - Full-screen home hero with four working routes ([components/HomeHero.tsx](components/HomeHero.tsx)) and a `/sign-in` route that reuses the existing account dialog.
-- Separate-page MFR component (AFH 33-337 Ch. 14), signature draw-on with a reduced-motion static state, and a memo data contract with validation ([components/MfrMemo.tsx](components/MfrMemo.tsx), [components/SignatureDraw.tsx](components/SignatureDraw.tsx), [content/memo.ts](content/memo.ts)). No approved memo has been supplied, so none is shown.
 - Community hierarchy with multiple parents and aliases, many-to-many play associations, adaptations that reference a base play, one static page per community, and graph validation ([lib/communityGraph.ts](lib/communityGraph.ts)).
 - Search matches community aliases and task language, and every play result shows its communities.
-- [docs/RESTRICTED_CONTENT_REQUIREMENTS.md](docs/RESTRICTED_CONTENT_REQUIREMENTS.md) and [docs/MEMO_INTAKE.md](docs/MEMO_INTAKE.md).
+- [docs/RESTRICTED_CONTENT_REQUIREMENTS.md](docs/RESTRICTED_CONTENT_REQUIREMENTS.md).
 - Navigation, community, home, and unit tests.
 
 ### Removed
+- The unused structured memorandum code: separate-page MFR component, signature draw-on, memo data contract, and intake guide. The leadership letter is linked as a PDF instead.
 - The standalone Plays page and navigation item (`/plays` redirects to `/communities`).
 - The "Concept demonstration" and "Plays are examples — check every draft before you sign it" header lines, and the "not an endorsement" wording in the hero, footer, and strategy section.
-- The old CSAF letter, quote, signature crop, and PDF.
+- The earlier CSAF letter, quote, and signature crop, replaced by the supplied PDF and the hero link (see Added).
 
 ### Changed
 - Tool links, saved items, and report links open plays inside their home community.

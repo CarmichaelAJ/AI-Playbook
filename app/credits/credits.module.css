@@ -17,6 +17,7 @@
   color: var(--color-silver);
   font-size: 15px;
   line-height: 1.8;
+  overflow-wrap: anywhere;
 }
 
 .list {

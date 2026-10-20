@@ -107,7 +107,7 @@ inside Communities.
 - **Dark scenes** use a CSS grade (gradient and navy multiply) over the
   photograph. Images are never edited; tone is adjusted only in CSS.
 - **Motion** is restrained and optional: the identity resolve in the hero,
-  the memorandum signature draw-on, a slow settle on the hero photograph, and scroll-linked
+  a slow settle on the hero photograph, and scroll-linked
   reveals and photographic drift (`.rise`, `.drift` in
   [app/globals.css](app/globals.css)). Scroll-linked effects use CSS only and are
   disabled by `prefers-reduced-motion` and unsupported browsers, where all content
@@ -143,22 +143,13 @@ The hero is the full-screen H1 plus four real routes: **Communities**, **Search*
 **Tools**, and **Sign in** ([components/HomeHero.tsx](components/HomeHero.tsx)).
 None of them scroll within the page.
 
-The approved memorandum is rendered directly below the hero by
-[components/MfrMemo.tsx](components/MfrMemo.tsx) in the separate-page MFR layout of
-AFH 33-337, *The Tongue and Quill*, Chapter 14 (pp. 190-191, 27 May 2015 edition):
-letterhead, date flush right, "MEMORANDUM FOR RECORD", SUBJECT, numbered
-paragraphs, signature and a modified signature block about 4.5 in from the left
-edge, and no FROM line. The layout only arranges supplied data; all wording
-lives in [content/memo.ts](content/memo.ts). The signature is drawn on by
-[components/SignatureDraw.tsx](components/SignatureDraw.tsx), which shows the
-complete static signature for reduced motion, print, and no JavaScript.
-
-**Status: no approved memorandum, letterhead, signature artwork, or endorsement
-attribution has been supplied, so `APPROVED_MEMO` is `null` and nothing is
-shown.** The old CSAF letter, quote, signature, and non-endorsement wording were
-removed. See [docs/MEMO_INTAKE.md](docs/MEMO_INTAKE.md) for what to supply and
-how to install it. The layout is a reference-based implementation; confirm the
-current edition and any command or local guidance before calling it compliant.
+The Chief of Staff's first letter to the force (3 Nov 2025) is a quiet link in the hero, set beneath
+the title: the signature in white ink, "First letter to the force", and the signer and date, behind a thin
+brass rule ([components/LeadershipLetter.tsx](components/LeadershipLetter.tsx)). It opens the signed PDF in
+the same tab. The page does not reproduce or reword the letter. The record, hash, and validation live in
+[content/leadershipLetter.ts](content/leadershipLetter.ts). The source is `handbook/assets/CSAF_Letter.pdf`;
+the PDF and the signature crop are in `public/assets/memo/`. The product owner approved showing the
+signature. See [docs/MEMO_ASSET_STATUS.md](docs/MEMO_ASSET_STATUS.md).
 
 First-visit setup is intentionally **optional**, so it no longer covers the
 opening. **Set up Home** and **Change setup** retain the existing device-local

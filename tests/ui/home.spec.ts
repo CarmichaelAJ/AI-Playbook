@@ -1,6 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { APPROVED_MEMO } from "../../content/memo";
 import { ALL_LIBRARY, SHELF_FILTERS, STRATEGY_STACK } from "../../content/library";
 
 test.beforeEach(async ({ page }) => {
@@ -27,16 +26,35 @@ test("hero shows the H1 and four working routes that leave the page", async ({ p
   }
 });
 
-test("header notices and the old leadership letter are gone", async ({ page }) => {
+test("header notices and the old unsupported endorsement wording are gone", async ({ page }) => {
   await expect(page.getByText("Concept demonstration", { exact: false })).toHaveCount(0);
   await expect(page.getByText("Plays are examples", { exact: false })).toHaveCount(0);
   await expect(page.getByText("Not an endorsement", { exact: false })).toHaveCount(0);
   await expect(page.getByText("Not a CSAF endorsement", { exact: false })).toHaveCount(0);
   await expect(page.locator("#leadership-source, [data-leadership-signature]")).toHaveCount(0);
-  await expect(page.getByText("First letter to the force")).toHaveCount(0);
   const html = await page.content();
   expect(html).not.toContain("csaf-first-letter");
   expect(html).not.toContain("csaf-wilsbach-signature");
+});
+
+test("the Chief of Staff letter is a quiet link in the hero that opens the signed PDF in the same tab", async ({ page }) => {
+  const hero = page.locator("section[aria-labelledby='playbook-title']");
+  const link = hero.getByTestId("leadership-letter");
+  await expect(link).toContainText("First letter to the force");
+  await expect(link).toContainText("General Kenneth S. Wilsbach");
+  await expect(link).toHaveAttribute("href", "/assets/memo/leadership-letter.pdf");
+  await expect(link).not.toHaveAttribute("target", /.+/);
+  const signature = link.locator("img");
+  await expect(signature).toHaveAttribute("alt", "");
+  await expect.poll(() => signature.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
+  expect((await page.request.get("/assets/memo/leadership-letter.pdf")).ok()).toBe(true);
+  // It sits with the title, above the four routes, and is not its own section.
+  const order = await link.evaluate((node) => {
+    const nav = document.querySelector("nav[aria-label='Start here']")!;
+    return Boolean(node.compareDocumentPosition(nav) & Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+  expect(order).toBe(true);
+  await expect(page.locator("[data-testid='leadership-letter']")).toHaveCount(1);
 });
 
 test("header uses the Air Force symbol at its native proportions", async ({ page }) => {
@@ -47,31 +65,6 @@ test("header uses the Air Force symbol at its native proportions", async ({ page
   const rendered = await symbol.boundingBox();
   expect(rendered!.width / rendered!.height).toBeCloseTo(338.667 / 264.018, 1);
   await expect(page.locator("header").getByText("AP", { exact: true })).toHaveCount(0);
-});
-
-test("the approved memorandum is shown only when one has been supplied", async ({ page }) => {
-  const memo = page.getByTestId("leadership-memo");
-  if (!APPROVED_MEMO) {
-    await expect(memo).toHaveCount(0);
-    return;
-  }
-  await expect(memo.getByRole("heading", { name: APPROVED_MEMO.heading })).toBeVisible();
-  await expect(memo.locator("time")).toHaveAttribute("datetime", APPROVED_MEMO.date.iso);
-  await expect(memo).toContainText(`SUBJECT: ${APPROVED_MEMO.subject}`);
-  if (APPROVED_MEMO.isSeparatePageMfr) await expect(memo).not.toContainText("FROM:");
-  for (const block of APPROVED_MEMO.body) await expect(memo).toContainText(block.text);
-  await expect(memo.locator("svg[role='img']")).toHaveAttribute("aria-label", APPROVED_MEMO.signature.alt);
-  await expect(memo).toContainText(APPROVED_MEMO.endorsement);
-  // Memo sits directly below the hero.
-  const order = await page.evaluate(() => {
-    const hero = document.querySelector("section[aria-labelledby='playbook-title']")!;
-    return hero.nextElementSibling?.getAttribute("data-testid");
-  });
-  expect(order).toBe("leadership-memo");
-  // Reduced motion: the complete static signature, no animation.
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.reload({ waitUntil: "networkidle" });
-  await expect(memo.locator("svg[role='img']")).toHaveAttribute("data-phase", "static");
 });
 
 test("optional setup saves preferences and saved items remain removable", async ({ page }) => {

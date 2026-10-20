@@ -3,7 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import PageHero from "@/components/PageHero";
 import { Photo } from "@/components/Photograph";
 import { PHOTOGRAPHS } from "@/content/photography";
-import { APPROVED_MEMO } from "@/content/memo";
+import { LEADERSHIP_LETTER } from "@/content/leadershipLetter";
 import styles from "./credits.module.css";
 
 export const metadata: Metadata = {
@@ -47,19 +47,16 @@ export default function CreditsPage() {
         </ul>
       </section>
 
-      {APPROVED_MEMO && (
-        <section className={styles.section} aria-labelledby="signature-heading">
-          <h2 id="signature-heading" className={styles.heading}>Memorandum and signature</h2>
-          <p className={styles.note}>
-            {APPROVED_MEMO.provenance.title}. {APPROVED_MEMO.provenance.approvedBy}. The signature was converted to SVG from
-            {" "}{APPROVED_MEMO.signature.source.description} (SHA-256 {APPROVED_MEMO.signature.source.sha256}).
-          </p>
-          <div className={styles.links}>
-            {APPROVED_MEMO.provenance.sourceUrl && <a href={APPROVED_MEMO.provenance.sourceUrl} target="_blank" rel="noopener noreferrer" className={styles.link}>Official source <ArrowUpRight size={14} aria-hidden="true" /></a>}
-            {APPROVED_MEMO.provenance.localUrl && <a href={APPROVED_MEMO.provenance.localUrl} target="_blank" rel="noopener noreferrer" className={styles.link}>Signed copy (PDF) <ArrowUpRight size={14} aria-hidden="true" /></a>}
-          </div>
-        </section>
-      )}
+      <section className={styles.section} aria-labelledby="signature-heading">
+        <h2 id="signature-heading" className={styles.heading}>Leadership letter</h2>
+        <p className={styles.note}>
+          {LEADERSHIP_LETTER.title}, dated {LEADERSHIP_LETTER.dateLabel}. Linked from the home page as the signed PDF, with the signature
+          image cropped from the scan and shown with the product owner&rsquo;s approval (SHA-256 {LEADERSHIP_LETTER.pdf.sha256}).
+        </p>
+        <div className={styles.links}>
+          <a href={LEADERSHIP_LETTER.pdf.href} className={styles.link}>Signed copy (PDF) <ArrowUpRight size={14} aria-hidden="true" /></a>
+        </div>
+      </section>
 
       <section className={styles.section} aria-labelledby="type-heading">
         <h2 id="type-heading" className={styles.heading}>Typefaces</h2>

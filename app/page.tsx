@@ -7,8 +7,6 @@ import { FEATURES } from "@/lib/features";
 import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
 import HomeSections from "@/components/HomeSections";
 import HomeHero from "@/components/HomeHero";
-import MfrMemo from "@/components/MfrMemo";
-import { APPROVED_MEMO } from "@/content/memo";
 import { Photo, PhotoCredit } from "@/components/Photograph";
 import { PHOTOGRAPHS } from "@/content/photography";
 import styles from "./home.module.css";
@@ -44,7 +42,6 @@ export default function HomePage() {
   return (
     <div className={`${styles.home} bleed`}>
       <HomeHero />
-      {APPROVED_MEMO && <MfrMemo memo={APPROVED_MEMO} />}
 
       <section className={`${styles.band} ${styles.statement}`} aria-labelledby="statement-title">
         <div className={`${styles.inner} ${styles.statementGrid}`}>
